@@ -1,0 +1,1809 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MedStudy — Blok Kedokteran FKIK UNJA</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&family=Playfair+Display:wght@700&display=swap" rel="stylesheet">
+<script>
+tailwind.config = {
+  theme: {
+    extend: {
+      colors: {
+        bg: '#030C14',
+        surface: '#07101C',
+        surface2: '#0A1929',
+        cyan: '#06B6D4',
+        'cyan-dim': '#3A5A73',
+        'cyan-bright': '#7BA3C0',
+        text: '#E0F2FE',
+        'text-dim': '#7BA3C0',
+        success: '#10B981',
+        warning: '#F59E0B',
+        danger: '#EF4444',
+      },
+      fontFamily: {
+        sans: ['Inter', 'sans-serif'],
+        mono: ['JetBrains Mono', 'monospace'],
+        display: ['Playfair Display', 'serif'],
+      }
+    }
+  }
+}
+</script>
+<style>
+  * { border-color: rgba(6,182,212,0.15); }
+  body {
+    background: #030C14;
+    color: #E0F2FE;
+    font-family: 'Inter', sans-serif;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+  .glass {
+    background: rgba(6,182,212,0.08);
+    backdrop-filter: blur(16px);
+    border: 1px solid rgba(6,182,212,0.15);
+    box-shadow: 0 4px 24px rgba(0,0,0,0.4), 0 0 1px rgba(6,182,212,0.1);
+  }
+  .glass:hover {
+    background: rgba(6,182,212,0.14);
+    border-color: rgba(6,182,212,0.3);
+    box-shadow: 0 8px 40px rgba(0,0,0,0.5), 0 0 1px rgba(6,182,212,0.2);
+  }
+  .glass-strong {
+    background: rgba(7,16,28,0.9);
+    backdrop-filter: blur(20px);
+    border: 1px solid rgba(6,182,212,0.2);
+  }
+  .nav-glow {
+    box-shadow: 0 2px 8px rgba(6,182,212,0.3);
+  }
+  .shimmer::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(105deg, transparent 40%, rgba(255,255,255,0.04) 50%, transparent 60%);
+    background-size: 200% 100%;
+    opacity: 0;
+    transition: opacity 0.3s;
+    pointer-events: none;
+  }
+  .shimmer:hover::after {
+    opacity: 1;
+    animation: shimmerMove 0.8s ease-out;
+  }
+  @keyframes shimmerMove {
+    0% { background-position: 100% 0; }
+    100% { background-position: -100% 0; }
+  }
+  .progress-bar {
+    background: linear-gradient(90deg, #06B6D4, #22d3ee);
+    box-shadow: 0 0 8px rgba(6,182,212,0.4);
+  }
+  .scrollbar-thin::-webkit-scrollbar { width: 6px; }
+  .scrollbar-thin::-webkit-scrollbar-track { background: transparent; }
+  .scrollbar-thin::-webkit-scrollbar-thumb { background: rgba(6,182,212,0.3); border-radius: 3px; }
+  .scrollbar-thin::-webkit-scrollbar-thumb:hover { background: rgba(6,182,212,0.5); }
+  .flip-card { perspective: 1000px; }
+  .flip-card-inner {
+    transition: transform 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+    transform-style: preserve-3d;
+  }
+  .flip-card.flipped .flip-card-inner { transform: rotateY(180deg); }
+  .flip-card-front, .flip-card-back {
+    backface-visibility: hidden;
+    -webkit-backface-visibility: hidden;
+  }
+  .flip-card-back { transform: rotateY(180deg); }
+  .page { display: none; animation: fadeIn 0.25s ease-out; }
+  .page.active { display: block; }
+  @keyframes fadeIn {
+    from { opacity: 0; transform: translateY(8px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+  .btn-primary {
+    background: linear-gradient(135deg, #06B6D4, #0891b2);
+    color: #030C14;
+    font-weight: 600;
+    transition: all 0.2s;
+  }
+  .btn-primary:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 4px 20px rgba(6,182,212,0.4);
+  }
+  .btn-primary:active { transform: scale(0.98); }
+  .btn-secondary {
+    background: rgba(6,182,212,0.1);
+    border: 1px solid rgba(6,182,212,0.3);
+    color: #E0F2FE;
+    transition: all 0.2s;
+  }
+  .btn-secondary:hover {
+    background: rgba(6,182,212,0.2);
+    border-color: rgba(6,182,212,0.5);
+  }
+  .option-btn {
+    transition: all 0.15s;
+    border: 1px solid rgba(6,182,212,0.2);
+  }
+  .option-btn:hover {
+    border-color: rgba(6,182,212,0.5);
+    background: rgba(6,182,212,0.1);
+  }
+  .option-btn.correct {
+    border-color: #10B981;
+    background: rgba(16,185,129,0.15);
+    color: #10B981;
+  }
+  .option-btn.wrong {
+    border-color: #EF4444;
+    background: rgba(239,68,68,0.15);
+    color: #EF4444;
+  }
+  .option-btn.disabled { pointer-events: none; opacity: 0.7; }
+  .explanation-box {
+    background: rgba(6,182,212,0.08);
+    border-left: 3px solid #06B6D4;
+  }
+  .streak-flame {
+    animation: flame 1.5s ease-in-out infinite;
+  }
+  @keyframes flame {
+    0%, 100% { transform: scale(1); }
+    50% { transform: scale(1.15); }
+  }
+  .timer-pulse {
+    animation: timerPulse 1s ease-in-out infinite;
+  }
+  @keyframes timerPulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.7; }
+  }
+  input::placeholder, textarea::placeholder {
+    color: #3A5A73;
+  }
+  .tab-active {
+    color: #E0F2FE;
+    border-bottom: 2px solid #06B6D4;
+    box-shadow: 0 2px 8px rgba(6,182,212,0.3);
+  }
+  .tab-inactive {
+    color: #7BA3C0;
+    border-bottom: 2px solid transparent;
+  }
+  .tab-inactive:hover {
+    color: #E0F2FE;
+    border-bottom-color: rgba(6,182,212,0.3);
+  }
+  .nav-btn {
+    padding: 0.5rem 1rem;
+    border-radius: 0.5rem;
+    font-size: 0.875rem;
+    font-weight: 500;
+    transition: all 0.2s;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+</style>
+<base target="_blank">
+</head>
+<body class="min-h-screen">
+
+<!-- Top Navigation -->
+<<nav class="fixed top-0 left-0 right-0 z-50 h-16 flex items-center justify-between px-6 lg:px-12" style="background:rgba(3,12,20,0.85); backdrop-filter:blur(16px); border-bottom:1px solid rgba(6,182,212,0.15);">
+  <button onclick="navigate('dashboard')" class="flex flex-col items-start text-left">
+    <span class="text-text font-semibold text-lg leading-tight tracking-tight">MedStudy</span>
+    <span class="text-cyan-dim text-[11px] font-medium tracking-[0.08em]">FKIK UNJA</span>
+  </button>
+  <div class="hidden md:flex items-center gap-6">
+    <button onclick="navigate('dashboard')" id="nav-dashboard" class="relative text-[13px] font-medium py-2 transition-colors duration-200 text-text">
+      Beranda<span class="nav-underline absolute bottom-0 left-0 right-0 h-0.5 rounded-full bg-cyan nav-glow"></span>
+    </button>
+    <button onclick="navigate('materials')" id="nav-materials" class="relative text-[13px] font-medium py-2 transition-colors duration-200 text-text-dim hover:text-text">
+      Materi<span class="nav-underline absolute bottom-0 left-0 right-0 h-0.5 rounded-full bg-cyan opacity-0 hover:opacity-100 transition-opacity"></span>
+    </button>
+    <button onclick="navigate('flashcards')" id="nav-flashcards" class="relative text-[13px] font-medium py-2 transition-colors duration-200 text-text-dim hover:text-text">
+      Flashcard<span class="nav-underline absolute bottom-0 left-0 right-0 h-0.5 rounded-full bg-cyan opacity-0 hover:opacity-100 transition-opacity"></span>
+    </button>
+    <button onclick="navigate('quiz')" id="nav-quiz" class="relative text-[13px] font-medium py-2 transition-colors duration-200 text-text-dim hover:text-text">
+      Kuis<span class="nav-underline absolute bottom-0 left-0 right-0 h-0.5 rounded-full bg-cyan opacity-0 hover:opacity-100 transition-opacity"></span>
+    </button>
+    <button onclick="navigate('exam')" id="nav-exam" class="relative text-[13px] font-medium py-2 transition-colors duration-200 text-text-dim hover:text-text">
+      Ujian<span class="nav-underline absolute bottom-0 left-0 right-0 h-0.5 rounded-full bg-cyan opacity-0 hover:opacity-100 transition-opacity"></span>
+    </button>
+  </div>
+  <div class="flex items-center gap-2">
+    <button onclick="navigate('settings')" class="w-9 h-9 rounded-full flex items-center justify-center transition-all duration-200 bg-cyan/10 border border-cyan/20 hover:border-cyan">
+      <svg class="w-[18px] h-[18px] text-text-dim hover:text-cyan transition-colors" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M12 1v6m0 6v6m4.22-10.22l4.24-4.24M6.34 17.66l-4.24 4.24M23 12h-6m-6 0H1m20.24 4.24l-4.24-4.24M6.34 6.34L2.1 2.1"/></svg>
+    </button>
+    <button onclick="navigate('help')" class="w-9 h-9 rounded-full flex items-center justify-center transition-all duration-200 bg-cyan/10 border border-cyan/20 hover:border-cyan">
+      <svg class="w-[18px] h-[18px] text-text-dim hover:text-cyan transition-colors" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><path d="M12 17h.01"/></svg>
+    </button>
+  </div>
+</nav>
+
+<!-- Mobile Bottom Nav -->
+<div class="md:hidden fixed bottom-0 left-0 right-0 z-50 h-14 flex items-center justify-around px-2" style="background:rgba(3,12,20,0.95); backdrop-filter:blur(16px); border-top:1px solid rgba(6,182,212,0.15);">
+  <button onclick="navigate('dashboard')" class="flex flex-col items-center gap-0.5 text-[10px] text-text-dim hover:text-cyan transition-colors">
+    <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+    Beranda
+  </button>
+  <button onclick="navigate('materials')" class="flex flex-col items-center gap-0.5 text-[10px] text-text-dim hover:text-cyan transition-colors">
+    <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>
+    Materi
+  </button>
+  <button onclick="navigate('flashcards')" class="flex flex-col items-center gap-0.5 text-[10px] text-text-dim hover:text-cyan transition-colors">
+    <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="2" y="3" width="20" height="14" rx="2" ry="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg>
+    Flashcard
+  </button>
+  <button onclick="navigate('quiz')" class="flex flex-col items-center gap-0.5 text-[10px] text-text-dim hover:text-cyan transition-colors">
+    <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>
+    Kuis
+  </button>
+  <button onclick="navigate('exam')" class="flex flex-col items-center gap-0.5 text-[10px] text-text-dim hover:text-cyan transition-colors">
+    <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
+    Ujian
+  </button>
+</div>
+
+<<main class="pt-16 pb-16 md:pb-0 min-h-screen">
+
+<!-- DASHBOARD -->
+<section id="page-dashboard" class="page active px-6 lg:px-12 py-8 max-w-7xl mx-auto">
+  <div class="mb-8">
+    <h1 class="font-display text-3xl md:text-4xl text-text mb-2">Selamat Datang Kembali</h1>
+    <p class="text-text-dim text-sm">Semester 2 • FKIK UNJA • Blok Farmakologi, Mikrobiologi, Imunologi, Biokimia, Gizi & Patologi</p>
+  </div>
+
+  <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
+    <div class="glass rounded-xl p-5 relative overflow-hidden shimmer">
+      <div class="flex items-center gap-3 mb-2">
+        <div class="w-8 h-8 rounded-lg bg-cyan/20 flex items-center justify-center">
+          <svg class="w-4 h-4 text-cyan" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M12 2q1 4 4 6.5t3 5.5a1 1 0 0 1-14 0 5 5 0 0 1 1-3 1 1 0 0 0 5 0c0-2-1.5-3-1.5-5q0-2 2.5-4"/></svg>
+        </div>
+        <span class="text-text-dim text-xs font-medium">Streak Belajar</span>
+      </div>
+      <div class="text-2xl font-bold text-text" id="dash-streak">3 hari</div>
+    </div>
+    <div class="glass rounded-xl p-5 relative overflow-hidden shimmer">
+      <div class="flex items-center gap-3 mb-2">
+        <div class="w-8 h-8 rounded-lg bg-success/20 flex items-center justify-center">
+          <svg class="w-4 h-4 text-success" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"/></svg>
+        </div>
+        <span class="text-text-dim text-xs font-medium">Jawaban Benar</span>
+      </div>
+      <div class="text-2xl font-bold text-text" id="dash-correct">0 soal</div>
+    </div>
+    <div class="glass rounded-xl p-5 relative overflow-hidden shimmer">
+      <div class="flex items-center gap-3 mb-2">
+        <div class="w-8 h-8 rounded-lg bg-warning/20 flex items-center justify-center">
+          <svg class="w-4 h-4 text-warning" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+        </div>
+        <span class="text-text-dim text-xs font-medium">Waktu Fokus</span>
+      </div>
+      <div class="text-2xl font-bold text-text" id="dash-focus">0 menit</div>
+    </div>
+    <div class="glass rounded-xl p-5 relative overflow-hidden shimmer cursor-pointer" onclick="navigate('materials')">
+      <div class="flex items-center gap-3 mb-2">
+        <div class="w-8 h-8 rounded-lg bg-cyan/20 flex items-center justify-center">
+          <svg class="w-4 h-4 text-cyan" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg>
+        </div>
+        <span class="text-text-dim text-xs font-medium">Progress Materi</span>
+      </div>
+      <div class="text-2xl font-bold text-text" id="dash-progress">0/9</div>
+    </div>
+  </div>
+
+  <div class="grid lg:grid-cols-3 gap-6">
+    <div class="lg:col-span-2 space-y-6">
+      <div class="glass rounded-xl p-6">
+        <h2 class="text-lg font-semibold text-text mb-4 flex items-center gap-2">
+          <svg class="w-5 h-5 text-cyan" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
+          Aksi Cepat
+        </h2>
+        <div class="grid grid-cols-2 md:grid-cols-4 gap-3">
+          <button onclick="navigate('materials')" class="glass rounded-lg p-4 text-center hover:border-cyan/50 transition-all group">
+            <div class="w-10 h-10 rounded-lg bg-cyan/20 flex items-center justify-center mx-auto mb-2 group-hover:scale-110 transition-transform">
+              <svg class="w-5 h-5 text-cyan" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+            </div>
+            <span class="text-xs text-text-dim">Baca Materi</span>
+          </button>
+          <button onclick="navigate('quiz')" class="glass rounded-lg p-4 text-center hover:border-cyan/50 transition-all group">
+            <div class="w-10 h-10 rounded-lg bg-success/20 flex items-center justify-center mx-auto mb-2 group-hover:scale-110 transition-transform">
+              <svg class="w-5 h-5 text-success" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>
+            </div>
+            <span class="text-xs text-text-dim">Kerjakan Kuis</span>
+          </button>
+          <button onclick="navigate('flashcards')" class="glass rounded-lg p-4 text-center hover:border-cyan/50 transition-all group">
+            <div class="w-10 h-10 rounded-lg bg-warning/20 flex items-center justify-center mx-auto mb-2 group-hover:scale-110 transition-transform">
+              <svg class="w-5 h-5 text-warning" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="2" y="3" width="20" height="14" rx="2" ry="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg>
+            </div>
+            <span class="text-xs text-text-dim">Flashcard</span>
+          </button>
+          <button onclick="startPomodoro()" class="glass rounded-lg p-4 text-center hover:border-cyan/50 transition-all group">
+            <div class="w-10 h-10 rounded-lg bg-danger/20 flex items-center justify-center mx-auto mb-2 group-hover:scale-110 transition-transform">
+              <svg class="w-5 h-5 text-danger" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+            </div>
+            <span class="text-xs text-text-dim">Pomodoro</span>
+          </button>
+        </div>
+      </div>
+
+      <div class="glass rounded-xl p-6">
+        <h2 class="text-lg font-semibold text-text mb-4 flex items-center gap-2">
+          <svg class="w-5 h-5 text-cyan" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+          Aktivitas Terbaru
+        </h2>
+        <div id="activity-list" class="space-y-3"></div>
+      </div>
+    </div>
+
+    <div class="space-y-6">
+      <div class="glass rounded-xl p-6 text-center">
+        <h3 class="text-sm font-medium text-text-dim mb-3">Pomodoro Timer</h3>
+        <div class="text-4xl font-mono font-bold text-cyan mb-4 timer-pulse" id="pomodoro-display">25:00</div>
+        <div class="flex gap-2 justify-center">
+          <button onclick="togglePomodoro()" id="pomodoro-btn" class="btn-primary px-4 py-2 rounded-lg text-sm">Mulai</button>
+          <button onclick="resetPomodoro()" class="px-4 py-2 rounded-lg text-sm border border-cyan/30 text-text-dim hover:bg-cyan/10 transition-colors">Reset</button>
+        </div>
+      </div>
+
+      <div class="glass rounded-xl p-6">
+        <h3 class="text-sm font-medium text-text-dim mb-4">Progress Materi</h3>
+        <div id="progress-list" class="space-y-3"></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- MATERIALS -->
+<section id="page-materials" class="page px-6 lg:px-12 py-8 max-w-7xl mx-auto">
+  <div class="mb-6">
+    <h1 class="font-display text-3xl text-text mb-2">Daftar Materi</h1>
+    <p class="text-text-dim text-sm">Pilih materi untuk memulai pembelajaran</p>
+  </div>
+  <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-4" id="materials-grid"></div>
+</section>
+
+<!-- MATERIAL DETAIL -->
+<section id="page-material-detail" class="page px-6 lg:px-12 py-8 max-w-5xl mx-auto">
+  <button onclick="navigate('materials')" class="flex items-center gap-2 text-text-dim hover:text-cyan transition-colors mb-6 text-sm">
+    <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M19 12H5m7 7l-7-7 7-7"/></svg>
+    Kembali ke Materi
+  </button>
+  <div id="material-content"></div>
+  <div class="glass rounded-xl p-6 mt-6">
+    <h3 class="text-lg font-semibold text-text mb-3 flex items-center gap-2">
+      <svg class="w-5 h-5 text-cyan" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+      Catatan Pribadi
+    </h3>
+    <textarea id="note-textarea" class="w-full h-32 bg-surface rounded-lg border border-cyan/20 p-4 text-sm text-text resize-none focus:border-cyan focus:outline-none transition-colors" placeholder="Tulis catatanmu di sini..."></textarea>
+    <div class="flex justify-end mt-3">
+      <button onclick="saveNote()" class="btn-primary px-5 py-2 rounded-lg text-sm">Simpan Catatan</button>
+    </div>
+  </div>
+</section>
+
+<!-- QUIZ LIST -->
+<section id="page-quiz" class="page px-6 lg:px-12 py-8 max-w-5xl mx-auto">
+  <div class="mb-6">
+    <h1 class="font-display text-3xl text-text mb-2">Kuis Interaktif</h1>
+    <p class="text-text-dim text-sm">Uji pemahamanmu dengan kuis per materi. Setiap soal dilengkapi penjelasan.</p>
+  </div>
+  <div class="grid md:grid-cols-2 gap-4" id="quiz-list"></div>
+</section>
+
+<!-- QUIZ RUN -->
+<section id="page-quiz-run" class="page px-6 lg:px-12 py-8 max-w-3xl mx-auto">
+  <div class="glass rounded-xl p-6 md:p-8">
+    <div class="flex items-center justify-between mb-6">
+      <button onclick="navigate('quiz')" class="flex items-center gap-2 text-text-dim hover:text-cyan transition-colors text-sm">
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M19 12H5m7 7l-7-7 7-7"/></svg>
+        Kembali
+      </button>
+      <div class="text-sm text-text-dim">Soal <span id="quiz-current" class="text-cyan font-semibold">1</span> / <span id="quiz-total">10</span></div>
+    </div>
+    <div class="w-full h-1 bg-surface rounded-full mb-6 overflow-hidden">
+      <div id="quiz-progress-bar" class="h-full progress-bar rounded-full transition-all duration-300" style="width: 0%"></div>
+    </div>
+    <div id="quiz-question-container"></div>
+    <div id="quiz-explanation" class="hidden mt-4 p-4 rounded-lg explanation-box text-sm text-text-dim"></div>
+    <div class="flex items-center justify-between mt-6 pt-4 border-t border-cyan/10">
+      <button onclick="prevQuizQuestion()" id="quiz-prev-btn" class="nav-btn btn-secondary opacity-50 cursor-not-allowed" disabled>
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M15 18l-6-6 6-6"/></svg>
+        Sebelumnya
+      </button>
+      <button onclick="nextQuizQuestion()" id="quiz-next-btn" class="nav-btn btn-primary opacity-50 cursor-not-allowed" disabled>
+        Selanjutnya
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M9 18l6-6-6-6"/></svg>
+      </button>
+      <button onclick="finishQuizEarly()" id="quiz-finish-btn" class="nav-btn btn-primary hidden">
+        Selesai
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M5 13l4 4L19 7"/></svg>
+      </button>
+    </div>
+  </div>
+</section>
+
+<!-- QUIZ RESULT -->
+<section id="page-quiz-result" class="page px-6 lg:px-12 py-8 max-w-2xl mx-auto text-center">
+  <div class="glass rounded-xl p-8 md:p-12">
+    <div class="w-20 h-20 rounded-full bg-cyan/20 flex items-center justify-center mx-auto mb-6">
+      <svg class="w-10 h-10 text-cyan" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+    </div>
+    <h2 class="font-display text-3xl text-text mb-2">Kuis Selesai!</h2>
+    <p class="text-text-dim mb-6">Berikut hasil pengerjaan kuismu</p>
+    <div class="text-5xl font-bold text-cyan mb-2" id="result-score">0/0</div>
+    <div class="text-lg text-text-dim mb-8" id="result-percentage">0% benar</div>
+    <div class="flex gap-3 justify-center">
+      <button onclick="navigate('quiz')" class="px-6 py-2.5 rounded-lg border border-cyan/30 text-text hover:bg-cyan/10 transition-colors">Kuis Lain</button>
+      <button onclick="retryQuiz()" class="btn-primary px-6 py-2.5 rounded-lg">Ulangi Kuis</button>
+    </div>
+  </div>
+</section>
+
+<!-- EXAM -->
+<section id="page-exam" class="page px-6 lg:px-12 py-8 max-w-5xl mx-auto">
+  <div class="mb-6">
+    <h1 class="font-display text-3xl text-text mb-2">Simulasi Ujian</h1>
+    <p class="text-text-dim text-sm">Latihan ujian komprehensif dengan timer dan penjelasan otomatis per soal</p>
+  </div>
+  <div class="grid md:grid-cols-2 gap-4" id="exam-list"></div>
+</section>
+
+<!-- EXAM RUN -->
+<section id="page-exam-run" class="page px-6 lg:px-12 py-8 max-w-4xl mx-auto">
+  <div class="glass rounded-xl p-6 md:p-8">
+    <div class="flex items-center justify-between mb-6 flex-wrap gap-3">
+      <button onclick="navigate('exam')" class="flex items-center gap-2 text-text-dim hover:text-cyan transition-colors text-sm">
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M19 12H5m7 7l-7-7 7-7"/></svg>
+        Kembali
+      </button>
+      <div class="flex items-center gap-4">
+        <div class="text-sm text-text-dim">Sisa Waktu: <span id="exam-timer" class="text-cyan font-mono font-semibold">60:00</span></div>
+        <div class="text-sm text-text-dim">Soal <span id="exam-current" class="text-cyan font-semibold">1</span> / <span id="exam-total">30</span></div>
+      </div>
+    </div>
+    <div class="w-full h-1 bg-surface rounded-full mb-6 overflow-hidden">
+      <div id="exam-progress-bar" class="h-full progress-bar rounded-full transition-all duration-300" style="width: 0%"></div>
+    </div>
+    <div id="exam-question-container"></div>
+    <div id="exam-explanation" class="hidden mt-4 p-4 rounded-lg explanation-box text-sm text-text-dim"></div>
+    <div class="flex items-center justify-between mt-6 pt-4 border-t border-cyan/10">
+      <button onclick="prevExamQuestion()" id="exam-prev-btn" class="nav-btn btn-secondary opacity-50 cursor-not-allowed" disabled>
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M15 18l-6-6 6-6"/></svg>
+        Sebelumnya
+      </button>
+      <button onclick="nextExamQuestion()" id="exam-next-btn" class="nav-btn btn-primary opacity-50 cursor-not-allowed" disabled>
+        Selanjutnya
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M9 18l6-6-6-6"/></svg>
+      </button>
+      <button onclick="finishExamEarly()" id="exam-finish-btn" class="nav-btn btn-primary hidden">
+        Selesai
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M5 13l4 4L19 7"/></svg>
+      </button>
+    </div>
+  </div>
+</section>
+
+<!-- EXAM RESULT -->
+<section id="page-exam-result" class="page px-6 lg:px-12 py-8 max-w-2xl mx-auto text-center">
+  <div class="glass rounded-xl p-8 md:p-12">
+    <div class="w-20 h-20 rounded-full bg-cyan/20 flex items-center justify-center mx-auto mb-6">
+      <svg class="w-10 h-10 text-cyan" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
+    </div>
+    <h2 class="font-display text-3xl text-text mb-2">Ujian Selesai!</h2>
+    <p class="text-text-dim mb-6">Hasil simulasi ujianmu</p>
+    <div class="text-5xl font-bold text-cyan mb-2" id="exam-result-score">0/0</div>
+    <div class="text-lg text-text-dim mb-2" id="exam-result-percentage">0% benar</div>
+    <div class="text-sm text-text-dim mb-8" id="exam-result-time">Waktu: 0 menit</div>
+    <div class="flex gap-3 justify-center">
+      <button onclick="navigate('exam')" class="px-6 py-2.5 rounded-lg border border-cyan/30 text-text hover:bg-cyan/10 transition-colors">Ujian Lain</button>
+      <button onclick="retryExam()" class="btn-primary px-6 py-2.5 rounded-lg">Ulangi Ujian</button>
+    </div>
+  </div>
+</section>
+
+<!-- FLASHCARDS -->
+<section id="page-flashcards" class="page px-6 lg:px-12 py-8 max-w-5xl mx-auto">
+  <div class="mb-6">
+    <h1 class="font-display text-3xl text-text mb-2">Flashcard</h1>
+    <p class="text-text-dim text-sm">Pelajari konsep penting dengan kartu interaktif</p>
+  </div>
+  <div class="mb-6 flex gap-2 flex-wrap" id="flashcard-filters">
+    <button onclick="filterFlashcards('all')" class="px-4 py-1.5 rounded-full text-sm border border-cyan/30 bg-cyan/20 text-text">Semua</button>
+    <button onclick="filterFlashcards('farmako')" class="px-4 py-1.5 rounded-full text-sm border border-cyan/20 text-text-dim hover:bg-cyan/10 transition-colors">Farmakologi</button>
+    <button onclick="filterFlashcards('mikro')" class="px-4 py-1.5 rounded-full text-sm border border-cyan/20 text-text-dim hover:bg-cyan/10 transition-colors">Mikrobiologi</button>
+    <button onclick="filterFlashcards('imuno')" class="px-4 py-1.5 rounded-full text-sm border border-cyan/20 text-text-dim hover:bg-cyan/10 transition-colors">Imunologi</button>
+    <button onclick="filterFlashcards('biokimia')" class="px-4 py-1.5 rounded-full text-sm border border-cyan/20 text-text-dim hover:bg-cyan/10 transition-colors">Biokimia</button>
+    <button onclick="filterFlashcards('gizi')" class="px-4 py-1.5 rounded-full text-sm border border-cyan/20 text-text-dim hover:bg-cyan/10 transition-colors">Gizi</button>
+    <button onclick="filterFlashcards('patologi')" class="px-4 py-1.5 rounded-full text-sm border border-cyan/20 text-text-dim hover:bg-cyan/10 transition-colors">Patologi</button>
+  </div>
+  <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-4" id="flashcards-grid"></div>
+</section>
+
+<!-- SETTINGS -->
+<section id="page-settings" class="page px-6 lg:px-12 py-8 max-w-2xl mx-auto">
+  <div class="mb-6">
+    <h1 class="font-display text-3xl text-text mb-2">Pengaturan</h1>
+    <p class="text-text-dim text-sm">Kelola data dan preferensi aplikasi</p>
+  </div>
+  <div class="glass rounded-xl p-6 space-y-6">
+    <div class="flex items-center justify-between">
+      <div>
+        <h3 class="text-text font-medium">Reset Data</h3>
+        <p class="text-text-dim text-sm">Hapus semua progress, catatan, dan riwayat</p>
+      </div>
+      <button onclick="resetData()" class="px-4 py-2 rounded-lg border border-danger/40 text-danger hover:bg-danger/10 transition-colors text-sm">Reset</button>
+    </div>
+    <div class="h-px bg-cyan/10"></div>
+    <div class="flex items-center justify-between">
+      <div>
+        <h3 class="text-text font-medium">Tentang MedStudy</h3>
+        <p class="text-text-dim text-sm">Versi 3.0 • FKIK UNJA</p>
+      </div>
+    </div>
+    <div class="h-px bg-cyan/10"></div>
+    <div>
+      <h3 class="text-text font-medium mb-2">Statistik Data</h3>
+      <div class="grid grid-cols-2 gap-3 text-sm">
+        <div class="glass rounded-lg p-3">
+          <div class="text-text-dim text-xs">Total Materi</div>
+          <div class="text-text font-semibold" id="settings-materials">9</div>
+        </div>
+        <div class="glass rounded-lg p-3">
+          <div class="text-text-dim text-xs">Total Kuis</div>
+          <div class="text-text font-semibold" id="settings-quizzes">9</div>
+        </div>
+        <div class="glass rounded-lg p-3">
+          <div class="text-text-dim text-xs">Total Flashcard</div>
+          <div class="text-text font-semibold" id="settings-flashcount">0</div>
+        </div>
+        <div class="glass rounded-lg p-3">
+          <div class="text-text-dim text-xs">Total Soal Ujian</div>
+          <div class="text-text font-semibold">60</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- HELP -->
+<section id="page-help" class="page px-6 lg:px-12 py-8 max-w-3xl mx-auto">
+  <div class="mb-6">
+    <h1 class="font-display text-3xl text-text mb-2">Panduan Pengguna</h1>
+    <p class="text-text-dim text-sm">Cara menggunakan MedStudy</p>
+  </div>
+  <div class="glass rounded-xl p-6 space-y-4">
+    <div>
+      <h3 class="text-text font-medium mb-1">📖 Materi</h3>
+      <p class="text-text-dim text-sm">Baca materi pembelajaran lengkap dengan gambaran konsep. Setiap materi memiliki catatan pribadi yang tersimpan otomatis.</p>
+    </div>
+    <div class="h-px bg-cyan/10"></div>
+    <div>
+      <h3 class="text-text font-medium mb-1">📝 Kuis</h3>
+      <p class="text-text-dim text-sm">Uji pemahaman dengan soal pilihan ganda. Setiap jawaban dilengkapi penjelasan detail. Gunakan tombol Sebelumnya/Selanjutnya untuk navigasi.</p>
+    </div>
+    <div class="h-px bg-cyan/10"></div>
+    <div>
+      <h3 class="text-text font-medium mb-1">🎴 Flashcard</h3>
+      <p class="text-text-dim text-sm">Klik kartu untuk membaliknya. Gunakan untuk menghafal definisi dan konsep penting.</p>
+    </div>
+    <div class="h-px bg-cyan/10"></div>
+    <div>
+      <h3 class="text-text font-medium mb-1">⏱️ Pomodoro</h3>
+      <p class="text-text-dim text-sm">Gunakan timer 25 menit untuk sesi fokus belajar. Waktu fokus akan tercatat di statistik.</p>
+    </div>
+  </div>
+</section>
+
+</main>
+
+<script>
+// ===================== DATA =====================
+
+const materialsData = [
+  {
+    id: "farmako-1",
+    title: "Farmakologi — Penggolongan Obat & Dosis",
+    category: "farmako",
+    description: "Penggolongan obat menurut Permenkes, penamaan, distribusi, bentuk sediaan, dan penentuan dosis.",
+    content: `
+      <h2 class="text-xl font-semibold text-text mb-3">Penggolongan Obat Berdasarkan Aturan (Permenkes No. 917/1993)</h2>
+      <ul class="list-disc list-inside text-text-dim space-y-2 mb-4 ml-2">
+        <li><strong class="text-text">Obat Bebas:</strong> Dijual bebas tanpa resep dokter. Tanda: lingkaran hijau dengan garis tepi hitam.</li>
+        <li><strong class="text-text">Obat Bebas Terbatas:</strong> Dijual bebas dengan tanda peringatan. Tanda: lingkaran biru dengan garis tepi hitam. Terdapat 6 macam tanda peringatan (P. No. 1–6).</li>
+        <li><strong class="text-text">Obat Keras:</strong> Hanya diperoleh dengan resep dokter. Tanda: lingkaran merah dengan huruf K di tengah. Hanya boleh dijual di apotek.</li>
+      </ul>
+      <h3 class="text-lg font-medium text-cyan mb-2">Obat Wajib Apotek (OWA)</h3>
+      <p class="text-text-dim leading-relaxed mb-4">Beberapa obat keras yang dapat diserahkan tanpa resep dokter, namun harus diserahkan oleh apoteker di apotek sesuai Keputusan Menkes No. 347/1990, 924/1993, dan 1176/1999.</p>
+      <h3 class="text-lg font-medium text-cyan mb-2">Narkotika & Psikotropika</h3>
+      <ul class="list-disc list-inside text-text-dim space-y-1 mb-4 ml-2">
+        <li><strong>Narkotika:</strong> Menyebabkan penurunan kesadaran, hilangnya rasa nyeri, dan ketergantungan. Golongan I (hanya untuk ilmu pengetahuan), II (terapi pilihan terakhir), III (potensi ringan).</li>
+        <li><strong>Psikotropika:</strong> Obat psikoaktif non-narkotika yang menyebabkan perubahan aktivitas mental dan perilaku.</li>
+        <li><strong>Prekursor Farmasi:</strong> Bahan baku produksi farmasi (ephedrine, pseudoephedrine, ergotamin, dll).</li>
+      </ul>
+      <h3 class="text-lg font-medium text-cyan mb-2">Obat Esensial & FRS</h3>
+      <p class="text-text-dim leading-relaxed mb-4"><strong>Obat Esensial:</strong> Obat terpilih yang paling diperlukan untuk pelayanan kesehatan (WHO & DOEN). Kriteria: benefit-risk ratio menguntungkan, mutu terjamin, praktis, dan rasio manfaat-biaya tertinggi. <strong>FRS (Formularium Rumah Sakit):</strong> Daftar obat yang disepakati untuk dipakai di rumah sakit bersangkutan.</p>
+      <h3 class="text-lg font-medium text-cyan mb-2">Penggolongan Lainnya</h3>
+      <ul class="list-disc list-inside text-text-dim space-y-1 mb-4 ml-2">
+        <li><strong>Struktur kimiawi:</strong> Obat dengan struktur mirip memiliki efek/ADME mirip (contoh: antibiotik β-laktam).</li>
+        <li><strong>Mekanisme kerja:</strong> Agonis vs antagonis, tempat ikatan (reseptor, enzim). Contoh: Antihistamin H1, PPI, Ca channel blocker, β-blocker, β2-agonis.</li>
+        <li><strong>Indikasi terapi:</strong> Antihipertensi, antiasma, antihiperlipidemia, antibiotik, analgetik, antidepresan, dll.</li>
+        <li><strong>Penamaan:</strong> Nama kimia, nama generik (INN/Farmakope Indonesia), nama dagang/merk.</li>
+        <li><strong>Distribusi:</strong> Sistemik vs lokal.</li>
+        <li><strong>Bentuk sediaan:</strong> Padat (serbuk, tablet, kapsul), setengah padat (salep, krim), cair (larutan, sirup, injeksi, suspensi).</li>
+      </ul>
+      <h3 class="text-lg font-medium text-cyan mb-2">Pengobatan Rasional</h3>
+      <p class="text-text-dim leading-relaxed mb-4">Tepat diagnosis, tepat obat/indikasi, tepat pasien, tepat dosis, tepat cara pemberian, tepat waktu (frekuensi & durasi), tepat biaya, dan tepat informasi (waspada efek samping).</p>
+      <h3 class="text-lg font-medium text-cyan mb-2">Penentuan Dosis</h3>
+      <ul class="list-disc list-inside text-text-dim space-y-1 mb-4 ml-2">
+        <li><strong>Berdasarkan usia:</strong> Young (n/(n+12)), Dilling (n/20), Fried (m/150), Gaubius.</li>
+        <li><strong>Berdasarkan berat badan:</strong> Clark (w/70 x dosis dewasa).</li>
+        <li><strong>Berdasarkan luas permukaan tubuh:</strong> Tabel konversi BB ke m².</li>
+        <li><strong>BSO cair (mg/mL):</strong> Hitung kebutuhan dosis → volume.</li>
+        <li><strong>Persentase (% w/v):</strong> Gram obat dalam 100 mL larutan.</li>
+        <li><strong>Rasio:</strong> 1:100 artinya 1 gram dalam 100 mL.</li>
+      </ul>
+    `
+  },
+  {
+    id: "mikro-1",
+    title: "Mikrobiologi — Prinsip Dasar Infeksi",
+    category: "mikro",
+    description: "Definisi infeksi, agen infeksi, rantai infeksi, mekanisme patogen, dan pencegahan infeksi nosokomial.",
+    content: `
+      <h2 class="text-xl font-semibold text-text mb-3">Pengertian Infeksi</h2>
+      <p class="text-text-dim leading-relaxed mb-4"><strong>Potter & Perry (2005):</strong> Proses invasi oleh mikroorganisme dan berproliferasi di dalam tubuh yang menyebabkan sakit. <strong>Kozier et al. (1995):</strong> Invasi tubuh oleh mikroorganisme dan berproliferasi dalam jaringan tubuh.</p>
+      <h3 class="text-lg font-medium text-cyan mb-2">Tanda-Tanda Infeksi (Cardinal Signs)</h3>
+      <ul class="list-disc list-inside text-text-dim space-y-1 mb-4 ml-2">
+        <li><strong>Rubor</strong> (kemerahan), <strong>Kalor</strong> (panas), <strong>Dolor</strong> (nyeri), <strong>Tumor</strong> (bengkak), <strong>Fungsio laesa</strong> (gangguan fungsi).</li>
+      </ul>
+      <h3 class="text-lg font-medium text-cyan mb-2">Agen Infeksi</h3>
+      <ul class="list-disc list-inside text-text-dim space-y-1 mb-4 ml-2">
+        <li><strong>Virus:</strong> Intraseluler obligat, replikasi dan lisis. Tahapan: adsorpsi → penetrasi → uncoating → injection → assembly → release.</li>
+        <li><strong>Bakteri:</strong> Prokariotik, inflamasi & toksin. Patogenesis: toksik (difteri, kolera) dan invasif.</li>
+        <li><strong>Jamur:</strong> Eukariotik, opportunistik, adhesi & hifa (yeast/mold).</li>
+        <li><strong>Parasit:</strong> Protozoa (uniseluler: Plasmodium) dan Helminth (multiseluler: cacing). Siklus hidup kompleks, immune evasion.</li>
+      </ul>
+      <h3 class="text-lg font-medium text-cyan mb-2">Rantai Infeksi</h3>
+      <ul class="list-disc list-inside text-text-dim space-y-1 mb-4 ml-2">
+        <li><strong>Faktor yang mempengaruhi:</strong> Bioflora (residen & transien), manusia, lingkungan.</li>
+        <li><strong>Metode penyebaran:</strong> Langsung, tidak langsung (media/vector), udara.</li>
+        <li><strong>Hospes yang rentan:</strong> Usia, hereditas, status imunisasi, terapi, nutrisi, kelelahan, stres.</li>
+      </ul>
+      <h3 class="text-lg font-medium text-cyan mb-2">Tahapan Proses Infeksi</h3>
+      <p class="text-text-dim leading-relaxed mb-4">Periode inkubasi → periode prodromal → periode sakit → periode konvalesensi.</p>
+      <h3 class="text-lg font-medium text-cyan mb-2">Infeksi Nosokomial</h3>
+      <p class="text-text-dim leading-relaxed mb-4">Infeksi yang terjadi di rumah sakit berasal dari fasilitas RS, tenaga kesehatan, atau pasien lain. Sumber: klien lain, pengunjung, klien, peralatan medis, lingkungan.</p>
+      <h3 class="text-lg font-medium text-cyan mb-2">Upaya Pencegahan & Pengendalian Infeksi</h3>
+      <ul class="list-disc list-inside text-text-dim space-y-1 mb-4 ml-2">
+        <li><strong>Standar:</strong> Asepsi, disinfeksi, dekontaminasi, pembersihan, sterilisasi.</li>
+        <li><strong>Antiseptik:</strong> Alkohol 70%, klorheksidin, iodofor (Betadine), triklosan.</li>
+        <li><strong>Disinfektan:</strong> Klorin pemutih 0,5%, glutaraldehid 2%, fenol.</li>
+        <li><strong>Sterilisasi:</strong> Uap (121°C, 106 kPa, 20–30 menit), panas kering (oven 160–180°C), kimia (glutaraldehid 2–4%, formaldehid 8%).</li>
+        <li><strong>DTT (Disinfeksi Tingkat Tinggi):</strong> Merebus 20 menit, mengukus 20 menit, atau kimia (klorin 0,1%).</li>
+      </ul>
+    `
+  },
+  {
+    id: "biokimia-1",
+    title: "Biokimia — Metabolisme Purin & Pirimidin",
+    category: "biokimia",
+    description: "Biosintesis de novo dan salvage, katabolisme, regulasi, serta penyakit terkait metabolisme purin dan pirimidin.",
+    content: `
+      <h2 class="text-xl font-semibold text-text mb-3">Biomedical Importance</h2>
+      <p class="text-text-dim leading-relaxed mb-4">Purin dan pirimidin berfungsi sebagai prekursor asam nukleat, energi metabolism, regulasi aktivitas enzim, dan signal transduction. Analog sintetis digunakan untuk kemoterapi kanker, AIDS, dan imunosupresan. Asam nukleat dari makanan bersifat non-esensial karena tubuh dapat mensintesisnya.</p>
+      <h3 class="text-lg font-medium text-cyan mb-2">Biosintesis Purin</h3>
+      <ul class="list-disc list-inside text-text-dim space-y-1 mb-4 ml-2">
+        <li><strong>De novo:</strong> Sintesis dari amphibolic intermediates (asam amino, CO₂, PRPP). PRPP glutamyl amidotransferase adalah enzim kunci yang diatur feedback oleh AMP dan GMP.</li>
+        <li><strong>Salvage:</strong> Konversi purin bebas atau ribonukleosida menjadi mononukleotida. Enzim: APRT dan HGPRT. Membutuhkan energi lebih sedikit daripada de novo.</li>
+        <li><strong>Regulasi:</strong> Konsentrasi PRPP menentukan laju sintesis. PRPP sintase diinhibisi oleh AMP, ADP, GMP, GDP. Hati adalah situs utama; otak dan eritrosit bergantung pada salvage.</li>
+      </ul>
+      <h3 class="text-lg font-medium text-cyan mb-2">Katabolisme Purin</h3>
+      <p class="text-text-dim leading-relaxed mb-4">Manusia mengkatabolisme purin menjadi asam urat karena <strong>kekurangan enzim urikase</strong> (tidak dapat mengubah asam urat menjadi alantoin). Peningkatan asam urat → gout.</p>
+      <h3 class="text-lg font-medium text-cyan mb-2">Biosintesis Pirimidin</h3>
+      <ul class="list-disc list-inside text-text-dim space-y-1 mb-4 ml-2">
+        <li><strong>De novo:</strong> Katalis awal adalah <strong>carbamoyl phosphate synthase II (sitosolik)</strong>. PRPP berpartisipasi setelah rakitan cincin pirimidin.</li>
+        <li><strong>Salvage:</strong> Fosforilasi thymidine oleh thymidine kinase.</li>
+        <li><strong>Regulasi:</strong> Carbamoyl phosphate synthase II diinhibisi oleh UTP dan purin nukleotida, diaktivasi oleh PRPP. Aspartate transcarbamoylase diinhibisi oleh CTP, diaktivasi oleh ATP.</li>
+      </ul>
+      <h3 class="text-lg font-medium text-cyan mb-2">Katabolisme Pirimidin</h3>
+      <p class="text-text-dim leading-relaxed mb-4">Menghasilkan metabolit larut air: CO₂, NH₃, β-alanine, dan β-aminoisobutyrate.</p>
+      <h3 class="text-lg font-medium text-cyan mb-2">Penyakit Terkait</h3>
+      <ul class="list-disc list-inside text-text-dim space-y-1 mb-4 ml-2">
+        <li><strong>Gout:</strong> Hiperurisemia akibat overproduksi atau underexkresi asam urat.</li>
+        <li><strong>Lesch-Nyhan syndrome:</strong> Defisiensi HGPRT → hiperurisemia, retardasi mental, perilaku automutilasi.</li>
+        <li><strong>Orotic aciduria:</strong> Defisiensi enzim dalam sintesis pirimidin → anemia megaloblastik yang tidak responsif dengan vitamin B12/asam folat.</li>
+      </ul>
+    `
+  },
+  {
+    id: "imuno-1",
+    title: "Imunologi — Respon Imun Innate",
+    category: "imuno",
+    description: "Komponen respon imun non spesifik, PRR, fagositosis, inflamasi, dan pertahanan humoral serta seluler.",
+    content: `
+      <h2 class="text-xl font-semibold text-text mb-3">Respon Imun Non Spesifik (Innate)</h2>
+      <p class="text-text-dim leading-relaxed mb-4">Respon cepat, tanpa memori, mengenali PAMPs (Pathogen-Associated Molecular Patterns). Komponen: hambatan fisik/kimia, fagosit, sel NK, sistem komplemen, sitokin, dan interferon.</p>
+      <h3 class="text-lg font-medium text-cyan mb-2">Pertahanan Fisik & Biokimiawi</h3>
+      <ul class="list-disc list-inside text-text-dim space-y-1 mb-4 ml-2">
+        <li><strong>Fisik:</strong> Kulit/keratin, silia saluran napas, batuk, bersin, flok urine, peristaltik usus, air mata.</li>
+        <li><strong>Biokimiawi:</strong> pH asam keringat, asam lemak kulit, lisozim (keringat, ludah, air mata, ASI), laktooksidase (ASI, saliva), asam klorida lambung, empedu & enzim proteolitik usus, laktoferin/transferrin (mengikat Fe).</li>
+      </ul>
+      <h3 class="text-lg font-medium text-cyan mb-2">Pattern Recognition Receptors (PRRs)</h3>
+      <p class="text-text-dim leading-relaxed mb-4">PRR mengenali PAMPs (LPS, flagelin, dsRNA) dan DAMPs (molekul sel inang yang rusak). Empat jenis: <strong>TLR, NLR, CLR, RLR</strong>. TLR yang terstimulasi mengaktifkan sekresi sitokin inflamasi → rekrutmen makrofag, netrofil, sel NK, dan DC.</p>
+      <h3 class="text-lg font-medium text-cyan mb-2">Fagositosis</h3>
+      <p class="text-text-dim leading-relaxed mb-4">Sel fagositik: makrofag, netrofil, sel dendritik. Tahapan: <strong>kemotaksis & adhesi → ingesti → digesti (fagolisosom) → ekskresi.</strong></p>
+      <h3 class="text-lg font-medium text-cyan mb-2">Inflamasi (Peradangan)</h3>
+      <ul class="list-disc list-inside text-text-dim space-y-1 mb-4 ml-2">
+        <li><strong>5 tanda cardinal:</strong> Kalor, rubor, dolor, tumor, fungsio laesa.</li>
+        <li><strong>Penyakit akibat peradangan kronis:</strong> Lupus, rheumatoid arthritis, asma, endokarditis, DM tipe 2, kanker, Alzheimer.</li>
+      </ul>
+      <h3 class="text-lg font-medium text-cyan mb-2">Pertahanan Humoral</h3>
+      <ul class="list-disc list-inside text-text-dim space-y-1 mb-4 ml-2">
+        <li><strong>Komplemen:</strong> 3 jalur aktivasi (klasik, alternatif, MBL). Fungsi: lisis, kemotaksis, opsonisasi. Anafilatoksin: C3a, C5a. Kemotaksin: C3a, C5a, C5-6-7. Opsonin: C3b, C4b.</li>
+        <li><strong>Interferon (IFN α/β):</strong> Glycoprotein antivirus yang menginduksi sel sekitar menjadi resisten dan mengaktifkan sel NK.</li>
+        <li><strong>CRP:</strong> Protein fase akut yang meningkat saat infeksi, berfungsi opsonisasi.</li>
+      </ul>
+      <h3 class="text-lg font-medium text-cyan mb-2">Pertahanan Seluler</h3>
+      <ul class="list-disc list-inside text-text-dim space-y-1 mb-4 ml-2">
+        <li><strong>Makrofag:</strong> Diferensiasi monosit, hidup lama, menghasilkan lisozim, komplemen, interferon, sitokin.</li>
+        <li><strong>Netrofil:</strong> Soldiers of the body, siklus hidup 7–10 jam, granula racun (lisozim, laktoferin, defensin).</li>
+        <li><strong>Sel dendritik:</strong> APC profesional, jembatan innate → adaptive immunity.</li>
+        <li><strong>Sel NK:</strong> Sitotoksik terhadap virus dan sel tumor tanpa bantuan antibodi.</li>
+        <li><strong>Eosinofil:</strong> Melawan parasit (MBP, EPO).</li>
+        <li><strong>Sel mast & basofil:</strong> Mediator inflamasi (histamin, heparin).</li>
+      </ul>
+    `
+  },
+  {
+    id: "farmasi-1",
+    title: "Farmasi — Teknik Penulisan Resep",
+    category: "farmasi",
+    description: "Definisi resep, unsur-unsur penulisan, bahasa latin, formula magistralis/officinalis/spesialistic, dan contoh resep.",
+    content: `
+      <h2 class="text-xl font-semibold text-text mb-3">Pengertian Resep</h2>
+      <p class="text-text-dim leading-relaxed mb-4">Menurut <strong>Permenkes No. 73 Tahun 2016</strong>, resep adalah permintaan tertulis dari dokter/dokter gigi kepada apoteker, dalam bentuk paper atau electronic, untuk menyediakan dan menyerahkan obat bagi pasien sesuai peraturan yang berlaku.</p>
+      <h3 class="text-lg font-medium text-cyan mb-2">Tindakan Dokter & Terapi</h3>
+      <ul class="list-disc list-inside text-text-dim space-y-1 mb-4 ml-2">
+        <li><strong>Tindakan:</strong> Anamnesis → pemeriksaan fisik → diagnosis → rekomendasi terapi.</li>
+        <li><strong>Terapi farmakologi:</strong> Profilaktik, simptomatik, kausal (menghilangkan penyebab).</li>
+        <li><strong>Terapi non-farmakologi:</strong> Pembedahan, radioterapi, fisioterapi, pengaturan pola makan dan hidup.</li>
+      </ul>
+      <h3 class="text-lg font-medium text-cyan mb-2">Pertimbangan Pemilihan Obat</h3>
+      <p class="text-text-dim leading-relaxed mb-4"><strong>MANFAAT (Efficacy) > KEAMANAN (Safety) > HARGA (Cost) > KESESUAIAN (Suitability).</strong> Pertimbangan dosis: dosis terapi, dosis anak (Young, Dilling, Fried, Clark, Gaubius, luas permukaan tubuh), dosis lansia, dosis obesitas.</p>
+      <h3 class="text-lg font-medium text-cyan mb-2">Yang Berhak Menulis Resep</h3>
+      <ul class="list-disc list-inside text-text-dim space-y-1 mb-4 ml-2">
+        <li>Dokter umum dan spesialis.</li>
+        <li>Dokter gigi (terbatas obat gigi dan mulut).</li>
+        <li>Dokter hewan (terbatas untuk hewan).</li>
+      </ul>
+      <h3 class="text-lg font-medium text-cyan mb-2">Ketentuan Penulisan Resep</h3>
+      <ul class="list-disc list-inside text-text-dim space-y-1 mb-4 ml-2">
+        <li>Dokter bertanggung jawab penuh.</li>
+        <li>Ditulis dengan tinta hitam/biru, tidak mudah terhapus.</li>
+        <li>Hindari rumus kimia (H₂O₂, NaCl) dan singkatan meragukan.</li>
+        <li>Boleh menulis >1 R/ dalam satu kertas resep.</li>
+        <li>Tulis di hadapan pasien, hindari coretan, baca kembali sebelum diberikan, perhatikan ekonomi pasien.</li>
+      </ul>
+      <h3 class="text-lg font-medium text-cyan mb-2">Macam Formula</h3>
+      <ul class="list-disc list-inside text-text-dim space-y-1 mb-4 ml-2">
+        <li><strong>Magistralis:</strong> Resep racikan yang ditulis dokter (R/ = Recipe = ambillah).</li>
+        <li><strong>Officinalis:</strong> Resep yang tercantum dalam farmakope/buku standar.</li>
+        <li><strong>Spesialistic:</strong> Menggunakan obat paten/dagang.</li>
+      </ul>
+      <h3 class="text-lg font-medium text-cyan mb-2">Unsur-Unsur Resep</h3>
+      <ul class="list-disc list-inside text-text-dim space-y-1 mb-4 ml-2">
+        <li><strong>Inscriptio:</strong> Nama, alamat, SIP dokter, tanggal.</li>
+        <li><strong>Invocatio:</strong> Tanda R/ (Resipe = ambillah).</li>
+        <li><strong>Prescriptio/Ordonatio:</strong> Nama obat, bentuk sediaan, dosis, jumlah.</li>
+        <li><strong>Signatura:</strong> Cara pakai, regimen, rute, interval waktu.</li>
+        <li><strong>Subscriptio:</strong> Tanda tangan/paraf dokter.</li>
+        <li><strong>Pro:</strong> Nama, alamat, umur, jenis kelamin, berat badan pasien.</li>
+      </ul>
+      <h3 class="text-lg font-medium text-cyan mb-2">Bahasa & Singkatan Latin</h3>
+      <p class="text-text-dim leading-relaxed mb-4">Digunakan untuk nama obat, pembuatan, bentuk sediaan, dan aturan pakai. Alasan: bahasa mati (tidak ambigu), internasional, menghindari dualisme, dan faktor psikologi. Contoh: <strong>dc</strong> = sedang makan, <strong>dd</strong> = sehari, <strong>dtd</strong> = berikan sebanyak dosis tersebut, <strong>f.l.a</strong> = buat menurut cara semestinya, <strong>gtt</strong> = tetes, <strong>iter</strong> = diulang, <strong>m.f.</strong> = campurlah dan buatlah, <strong>u.e</strong> = obat luar, <strong>ungt</strong> = salep.</p>
+      <h3 class="text-lg font-medium text-cyan mb-2">Resep CITO</h3>
+      <p class="text-text-dim leading-relaxed mb-4">Ditulis tanda CITO! untuk pasien gawat. Harus didahulukan pembuatannya. Hanya untuk kondisi yang penundaan pemberian obat akan membahayakan jiwa.</p>
+      <h3 class="text-lg font-medium text-cyan mb-2">Contoh Resep</h3>
+      <div class="bg-surface rounded-lg p-4 text-text-dim text-sm font-mono mb-4">
+        R/ Cap Amoksisilin 500 mg No. XV<br>
+        S. 3 dd cap I (paraf)<br>
+        Pro : Tn Amir | Usia : Dws<br><br>
+        R/ CTM 2 mg<br>
+        &nbsp;&nbsp;&nbsp;&nbsp;DMP 7,5 mg<br>
+        &nbsp;&nbsp;&nbsp;&nbsp;Prednison 2 mg<br>
+        mf.pulv dtd No. XV<br>
+        S. 3 dd pulv I (paraf)<br>
+        Pro : Siti Kirani | Umur : 7 tahun
+      </div>
+    `
+  },
+  {
+    id: "imuno-2",
+    title: "Imunologi — Respon Imun terhadap Patogen",
+    category: "imuno",
+    description: "Mekanisme respon imun terhadap bakteri ekstra/intraseluler, virus, dan parasit serta strategi evasi.",
+    content: `
+      <h2 class="text-xl font-semibold text-text mb-3">Respon Imun terhadap Bakteri</h2>
+      <h3 class="text-lg font-medium text-cyan mb-2">Bakteri Ekstraseluler</h3>
+      <ul class="list-disc list-inside text-text-dim space-y-1 mb-4 ml-2">
+        <li>Contoh: Staphylococcus, Streptococcus, E. coli, Neisseria.</li>
+        <li><strong>Imunitas bawaan:</strong> Aktivasi komplemen (jalur alternatif/lektil), fagositosis, respon radang.</li>
+        <li><strong>Imunitas dapatan:</strong> Antibodi (IgG, IgM, IgA) → opsonisasi, netralisasi toksin, aktivasi komplemen jalur klasik. Sel Th → sitokin (IFN-γ, TNF) → aktivasi makrofag.</li>
+      </ul>
+      <h3 class="text-lg font-medium text-cyan mb-2">Bakteri Intraselular</h3>
+      <ul class="list-disc list-inside text-text-dim space-y-1 mb-4 ml-2">
+        <li>Contoh: Mycobacteria, Listeria, Legionella. Bertahan dalam fagosom, tidak terjangkau antibodi.</li>
+        <li><strong>Imunitas bawaan:</strong> Fagosit & sel NK → IFN-γ membantu makrofag menghancurkan bakteri.</li>
+        <li><strong>Imunitas dapatan (sel-mediated):</strong> CD4 Th1 → IFN-γ aktivasi makrofag. CD8 CTL → membunuh sel yang terinfeksi melalui MHC I.</li>
+      </ul>
+      <h2 class="text-xl font-semibold text-text mb-3 mt-6">Respon Imun terhadap Virus</h2>
+      <ul class="list-disc list-inside text-text-dim space-y-1 mb-4 ml-2">
+        <li><strong>Innate:</strong> Interferon tipe I (IFN α/β) → antiviral, aktivasi sel NK. NK cells membunuh sel terinfeksi tanpa MHC.</li>
+        <li><strong>Adaptif:</strong> CD8 CTL → membunuh sel terinfeksi (MHC I). CD4 Th → membantu respons. Antibodi → netralisasi virus ekstraseluler, opsonisasi, ADCC.</li>
+        <li><strong>Evasi virus:</strong> Variasi antigen (drift/shift), disrupt interferon, encode sitokin homolog (vIL-10), kontrol ekspresi MHC (CMV, herpes).</li>
+      </ul>
+      <h3 class="text-lg font-medium text-cyan mb-2">Vaksin</h3>
+      <ul class="list-disc list-inside text-text-dim space-y-1 mb-4 ml-2">
+        <li><strong>Vaksin hidup:</strong> Adenovirus, measles, varicella, mumps, polio Sabin, rotavirus, rubella, yellow fever.</li>
+        <li><strong>Vaksin mati:</strong> Hepatitis A, influenza, polio Salk, rabies.</li>
+      </ul>
+      <h2 class="text-xl font-semibold text-text mb-3 mt-6">Respon Imun terhadap Parasit</h2>
+      <ul class="list-disc list-inside text-text-dim space-y-1 mb-4 ml-2">
+        <li><strong>Protozoa intraseluler:</strong> Aktivasi sel T (Th1) → IFN-γ, makrofag, sel NK. Antibodi (IgG, IgE) + komplemen jalur alternatif + eosinofil.</li>
+        <li><strong>Protozoa ekstraseluler:</strong> Barrier mekanik & kimiawi, antibodi, komplemen.</li>
+        <li><strong>Metazoa (Helmintes):</strong> Respons condong ke Th2. APC (sel dendritik & NeMac/AAM) → diferensiasi Th0 → Th2. Produksi IL-10, TGF-β, NO, prostaglandin → hambatan proliferasi sel T. Eosinofil + MBP + IgE → killing ekstraseluler.</li>
+      </ul>
+    `
+  },
+  {
+    id: "imuno-3",
+    title: "Imunologi — Konsep Dasar Sel & Jaringan Imun",
+    category: "imuno",
+    description: "Definisi imunologi, sel-sel sistem imun non spesifik dan spesifik, komplemen, interferon, dan perbedaan respon.",
+    content: `
+      <h2 class="text-xl font-semibold text-text mb-3">Definisi</h2>
+      <ul class="list-disc list-inside text-text-dim space-y-1 mb-4 ml-2">
+        <li><strong>Immunology:</strong> Studi mekanisme biologis seluler, molekular, dan fungsional sistem imun.</li>
+        <li><strong>Sistem Imun:</strong> Terdiri dari molekuler, seluler, jaringan, dan organ untuk proteksi tubuh.</li>
+        <li><strong>Imunitas:</strong> Proteksi dari penyakit infeksi.</li>
+      </ul>
+      <h3 class="text-lg font-medium text-cyan mb-2">Sel-Sel Sistem Imun Non Spesifik</h3>
+      <ul class="list-disc list-inside text-text-dim space-y-1 mb-4 ml-2">
+        <li><strong>Fagosit mononuklier:</strong> Monosit & makrofag (fagosit profesional & APC).</li>
+        <li><strong>Fagosit polimorfonuklier (PMN):</strong> Neutrofil (7–10 jam), eosinofil (melawan parasit), basofil (mediator).</li>
+        <li><strong>Sel Nol (LGL):</strong> Sel NK (membunuh tumor & virus tanpa antibodi) dan Sel K (efektor ADCC).</li>
+        <li><strong>Sel Mediator:</strong> Basofil & mastosit (histamin, inflamasi), trombosit (agregasi, sitotoksik).</li>
+        <li><strong>Sel Aksesori:</strong> Eosinofil, basofil, mastosit, trombosit, APC.</li>
+      </ul>
+      <h3 class="text-lg font-medium text-cyan mb-2">Sel-Sel Sistem Imun Spesifik</h3>
+      <ul class="list-disc list-inside text-text-dim space-y-1 mb-4 ml-2">
+        <li><strong>Sel T:</strong> Asal sumsum tulang → timus. Subset: Th, Ts, Tdh, Tc, naif, Th0, regulator. Fungsi: bantu sel B produksi antibodi, hancurkan sel terinfeksi virus, aktivasi makrofag, kontrol kualitas imun.</li>
+        <li><strong>Sel B:</strong> Perkembangan awal antigen-independen. Fungsi utama: produksi antibodi. Dibantu sel T → diferensiasi menjadi sel plasma → membentuk Ig spesifik.</li>
+      </ul>
+      <h3 class="text-lg font-medium text-cyan mb-2">Sistem Imun Non Spesifik vs Spesifik</h3>
+      <div class="overflow-x-auto mb-4">
+        <table class="w-full text-sm text-text-dim border border-cyan/20 rounded-lg">
+          <thead class="bg-surface text-text"><tr><th class="p-2 text-left">Aspek</th><th class="p-2 text-left">Non Spesifik</th><th class="p-2 text-left">Spesifik</th></tr></thead>
+          <tbody>
+            <tr class="border-t border-cyan/10"><td class="p-2">Resistensi</td><td class="p-2">Tidak berubah oleh infeksi</td><td class="p-2">Membaik oleh infeksi berulang (memori)</td></tr>
+            <tr class="border-t border-cyan/10"><td class="p-2">Spesifitas</td><td class="p-2">Umum untuk semua mikroba</td><td class="p-2">Spesifik untuk mikroba yang pernah dijumpai</td></tr>
+            <tr class="border-t border-cyan/10"><td class="p-2">Sel penting</td><td class="p-2">Fagosit, NK, Sel K</td><td class="p-2">Limfosit (T & B)</td></tr>
+            <tr class="border-t border-cyan/10"><td class="p-2">Molekul</td><td class="p-2">Lisozim, komplemen, interferon</td><td class="p-2">Antibodi, sitokin</td></tr>
+            <tr class="border-t border-cyan/10"><td class="p-2">Respon time</td><td class="p-2">Menit/jam, selalu siap</td><td class="p-2">Hari (lambat), memerlukan pajanan</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <h3 class="text-lg font-medium text-cyan mb-2">Pertahanan Humoral: Komplemen</h3>
+      <ul class="list-disc list-inside text-text-dim space-y-1 mb-4 ml-2">
+        <li><strong>Fungsi:</strong> Lisis membran bakteri, kemotaksis, opsonisasi, eliminasi kompleks imun.</li>
+        <li><strong>Anafilatoksin:</strong> C3a, C5a → degranulasi mastosit/basofil → histamin → ↑ permeabilitas vaskular.</li>
+        <li><strong>Kemotaksin:</strong> C3a, C5a, C5-6-7 → menarik fagosit.</li>
+        <li><strong>Opsonin:</strong> C3b, C4b → jembatan antara antigen dan fagosit.</li>
+        <li><strong>Aktivasi:</strong> C1q (membutuhkan IgG1-3, IgM) → C1r → C1s → C4 → jalur klasik.</li>
+      </ul>
+      <h3 class="text-lg font-medium text-cyan mb-2">Interferon & CRP</h3>
+      <p class="text-text-dim leading-relaxed mb-4"><strong>Interferon (IFN):</strong> Glycoprotein antivirus yang dihasilkan sel berinti saat infeksi virus → induksi resistensi sel sekitar & aktivasi NK. <strong>CRP:</strong> Protein fase akut yang meningkat saat infeksi akut/kerusakan jaringan, mengikat komplemen secara opsonisasi.</p>
+    `
+  },
+  {
+    id: "gizi-1",
+    title: "Gizi — Penilaian Status Gizi Antropometri",
+    category: "gizi",
+    description: "Metode antropometri untuk menilai status gizi: BB, TB, LILA, lingkar perut, kepala, TLBK, dan RLPP.",
+    content: `
+      <h2 class="text-xl font-semibold text-text mb-3">Penilaian Status Gizi</h2>
+      <p class="text-text-dim leading-relaxed mb-4">Dinilai secara <strong>langsung</strong> (antropometri, klinis, biokimia) dan <strong>tidak langsung</strong> (konsumsi makanan, vital statistik).</p>
+      <h3 class="text-lg font-medium text-cyan mb-2">Berat Badan (BB)</h3>
+      <p class="text-text-dim leading-relaxed mb-4">Alat: timbangan dengan ketelitian 0,1 kg. Pastikan angka nol, posisi tegak lurus, pandangan ke depan, tidak bergerak. Catat dalam kg.</p>
+      <h3 class="text-lg font-medium text-cyan mb-2">Tinggi Badan (TB)</h3>
+      <p class="text-text-dim leading-relaxed mb-4">Alat: stadiometer/mikrotois (ketelitian 0,1 cm). Bayi 0–2 tahun diukur <strong>panjang badan</strong>; >2 tahun menggunakan mikrotois. Prosedur: lepas alas kaki/topi, berdiri tegak (kepala, punggung, pantat, tumit menempel dinding), pandangan lurus ke depan, turunkan pengukur ke puncak kepala. Catat dalam cm.</p>
+      <h3 class="text-lg font-medium text-cyan mb-2">Lingkar Lengan Atas (LILA)</h3>
+      <p class="text-text-dim leading-relaxed mb-4">Menggambarkan keadaan jaringan otot dan lemak bawah kulit. <strong>Ambang batas WUS dengan risiko KEK: 23,5 cm.</strong> Jika <23,5 cm berisiko melahirkan BBLR. Ukur pada lengan kiri/non-dominan.</p>
+      <h3 class="text-lg font-medium text-cyan mb-2">Lingkar Perut & Rasio Pinggang-Panggul (RLPP)</h3>
+      <p class="text-text-dim leading-relaxed mb-4">Lingkar perut menunjukkan simpanan lemak visceral. Prosedur: berdiri tegak, kaki rapat, napas normal. Tandai titik antara tulang rusuk terbawah & tulang panggul atas, lilitkan pita. <strong>RLPP = Lingkar Pinggang / Lingkar Panggul.</strong> Contoh: pria dengan LP 90 cm & LPg 87 cm → RLPP = 1,034 (berisiko sindrom metabolik).</p>
+      <h3 class="text-lg font-medium text-cyan mb-2">Lingkar Kepala</h3>
+      <p class="text-text-dim leading-relaxed mb-4">Mencerminkan volume intrakranial dan pertumbuhan otak. Pengukuran pada bidang Frankfort horizontal di atas glabela. Referensi CDC 2000: bayi laki-laki baru lahir 36 cm (3 bulan 41 cm); perempuan 35 cm (3 bulan 40 cm). <strong>Mikrosefali:</strong> lingkar kepala < -2SD. Penyebab: alkohol/obat saat kehamilan, infeksi TORCH, atrofi otak.</p>
+      <h3 class="text-lg font-medium text-cyan mb-2">Tinggi Lutut (Knee Height)</h3>
+      <p class="text-text-dim leading-relaxed mb-4">Berkorelasi dengan tinggi badan. Digunakan untuk lansia atau klien yang tidak dapat berdiri tegak. Alat: caliper (kaliper). Ukur lutut kiri dengan posisi sudut siku-siku (90°), posisi duduk atau tidur. Pada lansia digunakan karena penurunan masa tulang/bungkuk menyebabkan TB tidak akurat.</p>
+      <h3 class="text-lg font-medium text-cyan mb-2">Tebal Lemak Bawah Kulit (TLBK / Skinfold)</h3>
+      <p class="text-text-dim leading-relaxed mb-4">Cadangan energi tubuh diukur melalui skinfold. Lokasi: tricep, bicep, subskapular, suprailiak, abdominal, paha, dll. Prosedur: jaringan subkutis dijepit & diangkat oleh jari tangan kiri, kaliper menjepit dasar skinfold 1 cm distal, tegak lurus. Baca setelah 2–3 detik, ulangi 3 kali (selisih maksimal 1 mm), dirata-ratakan.</p>
+    `
+  },
+  {
+    id: "patologi-1",
+    title: "Patologi — Wound Healing (Penyembuhan Luka)",
+    category: "patologi",
+    description: "Fase hemostasis, inflamasi, proliferasi, remodeling, komplikasi, dan faktor yang mempengaruhi penyembuhan luka.",
+    content: `
+      <h2 class="text-xl font-semibold text-text mb-3">Definisi & Tipe Penyembuhan</h2>
+      <p class="text-text-dim leading-relaxed mb-4"><strong>Wound healing</strong> adalah proses biologis kompleks untuk memulihkan integritas jaringan dan fungsi. Melibatkan sel, matriks ekstraseluler (ECM), dan growth factors.</p>
+      <ul class="list-disc list-inside text-text-dim space-y-1 mb-4 ml-2">
+        <li><strong>Primary intention:</strong> Luka bersih, tepi rapi, dijahit (minimal scar).</li>
+        <li><strong>Secondary intention:</strong> Kehilangan jaringan luas, granulasi, kontraksi luka, scar besar.</li>
+        <li><strong>Tertiary intention:</strong> Delayed primary closure (luka dibuka dulu, ditutup kemudian).</li>
+      </ul>
+      <h3 class="text-lg font-medium text-cyan mb-2">Fase Penyembuhan Luka</h3>
+      <ul class="list-disc list-inside text-text-dim space-y-1 mb-4 ml-2">
+        <li><strong>Hemostasis (menit–jam):</strong> Vasokonstriksi, aktivasi platelet, pembentukan fibrin clot. Platelet melepaskan PDGF dan TGF-β untuk memulai kaskade penyembuhan.</li>
+        <li><strong>Inflamasi (hari 1–3):</strong> Neutrofil (early, fagositosis bakteri), makrofag & limfosit (later). Makrofag sebagai key regulator: produksi VEGF, FGF, TGF-β, aktivasi fibroblas.</li>
+        <li><strong>Proliferasi (hari 3–21):</strong>
+          <ul class="list-circle list-inside ml-4 mt-1">
+            <li><strong>Granulation tissue:</strong> Jaringan granulasi dengan vaskularisasi tinggi, fibroblas aktif, ECM longgar.</li>
+            <li><strong>Angiogenesis:</strong> Dihambat/ditimuli VEGF → migrasi sel endotel → pembentukan lumen.</li>
+            <li><strong>Fibroplasia:</strong> Fibroblas memproduksi kolagen tipe III (lemah).</li>
+            <li><strong>Re-epithelialization:</strong> Migrasi sel epitel menutupi permukaan luka.</li>
+            <li><strong>Wound contraction:</strong> Aktivitas myofibroblast menarik tepi luka.</li>
+          </ul>
+        </li>
+        <li><strong>Remodeling (minggu–bulan):</strong> Kolagen tipe III → tipe I. Peningkatan kekuatan tarik (tensile strength), berkurangnya vaskularisasi.</li>
+      </ul>
+      <h3 class="text-lg font-medium text-cyan mb-2">Growth Factors & ECM</h3>
+      <ul class="list-disc list-inside text-text-dim space-y-1 mb-4 ml-2">
+        <li><strong>PDGF:</strong> Aktivasi fibroblas.</li>
+        <li><strong>VEGF:</strong> Angiogenesis.</li>
+        <li><strong>TGF-β:</strong> Sintesis kolagen.</li>
+        <li><strong>EGF:</strong> Regenerasi epitel.</li>
+        <li><strong>ECM:</strong> Kolagen, fibronektin, proteoglikan sebagai scaffold struktural.</li>
+      </ul>
+      <h3 class="text-lg font-medium text-cyan mb-2">Faktor yang Mempengaruhi</h3>
+      <ul class="list-disc list-inside text-text-dim space-y-1 mb-4 ml-2">
+        <li><strong>Lokal:</strong> Infeksi, iskemia, benda asing.</li>
+        <li><strong>Sistemik:</strong> Diabetes, nutrisi buruk, usia lanjut, steroid.</li>
+      </ul>
+      <h3 class="text-lg font-medium text-cyan mb-2">Komplikasi</h3>
+      <ul class="list-disc list-inside text-text-dim space-y-1 mb-4 ml-2">
+        <li><strong>Keloid:</strong> Pertumbuhan jaringan parut melampaui batas luka (beyond margin).</li>
+        <li><strong>Hypertrophic scar:</strong> Penebalan jaringan parut terbatas dalam batas luka (confined).</li>
+        <li><strong>Chronic wounds:</strong> Diabetic ulcers, venous ulcers (poor collagen, inadequate blood supply, chronic inflammation).</li>
+      </ul>
+    `
+  }
+];
+
+const quizzesData = [
+  {
+    id: "farmako-1",
+    title: "Kuis Penggolongan Obat & Dosis",
+    category: "farmako",
+    questions: [
+      { q: "Tanda khusus obat bebas menurut Permenkes No. 917/1993 adalah?", options: ["Lingkaran merah dengan huruf K", "Lingkaran biru dengan garis tepi hitam", "Lingkaran hijau dengan garis tepi hitam", "Segitiga kuning"], correct: 2, explanation: "Obat bebas ditandai dengan lingkaran berwarna hijau dengan garis tepi hitam. Biru untuk bebas terbatas, merah untuk keras." },
+      { q: "Narkotika Golongan II menurut UU 35/2009 adalah?", options: ["Hanya untuk ilmu pengetahuan", "Berkhasiat pengobatan pilihan terakhir, potensi tinggi", "Banyak digunakan dalam terapi, potensi ringan", "Tidak ada ketergantungan"], correct: 1, explanation: "Gol II: narkotika berkhasiat pengobatan pilihan terakhir, potensi tinggi mengakibatkan ketergantungan (morfin, petidin). Gol III potensi ringan (kodeina)." },
+      { q: "Penggolongan obat berdasarkan mekanisme kerja PPI (Proton Pump Inhibitor) adalah?", options: ["Menghambat reseptor H1", "Menghambat pompa proton di sel gaster", "Memblok kanal kalsium", "Menstimulasi reseptor β2"], correct: 1, explanation: "PPI bekerja menghambat pompa proton (H+/K+-ATPase) di sel parietal gaster. Contoh: omeprazole, lansoprazole." },
+      { q: "Rumus Young untuk dosis anak adalah?", options: ["n/20 x dosis dewasa", "n/(n+12) x dosis dewasa", "m/150 x dosis dewasa", "w/70 x dosis dewasa"], correct: 1, explanation: "Rumus Young: n/(n+12) x dosis dewasa, dengan n = umur dalam tahun. Dilling: n/20. Fried: m/150 (bulan). Clark: w/70 (berat badan)." },
+      { q: "Pengobatan rasional mencakup tepat waktu yang berarti?", options: ["Hanya dosis yang tepat", "Frekuensi pemberian dan durasi yang tepat", "Cara pemberian oral saja", "Biaya murah"], correct: 1, explanation: "Tepat waktu meliputi frekuensi pemberian dan durasi terapi yang sesuai, selain tepat diagnosis, obat, pasien, dosis, cara, biaya, dan informasi." }
+    ]
+  },
+  {
+    id: "mikro-1",
+    title: "Kuis Prinsip Dasar Infeksi",
+    category: "mikro",
+    questions: [
+      { q: "Tanda-tanda infeksi (cardinal signs) meliputi kecuali?", options: ["Rubor", "Kalor", "Pruritus", "Fungsio laesa"], correct: 2, explanation: "5 tanda cardinal infeksi adalah rubor (kemerahan), kalor (panas), dolor (nyeri), tumor (bengkak), dan fungsio laesa (gangguan fungsi). Pruritus (gatal) bukan tanda cardinal." },
+      { q: "Tahapan siklus hidup virus yang benar adalah?", options: ["Adsorpsi → penetrasi → uncoating → replikasi → assembly → release", "Penetrasi → adsorpsi → uncoating → replikasi → release → assembly", "Adsorpsi → uncoating → penetrasi → assembly → replikasi → release", "Replikasi → adsorpsi → penetrasi → uncoating → release"], correct: 0, explanation: "Siklus virus: adsorpsi (perlekatan) → penetrasi (masuk sel) → uncoating (pelepasan selubung) → injection/replikasi → assembly (perakitan) → release (keluar)." },
+      { q: "Mekanisme utama infeksi jamur adalah?", options: ["Replikasi dan lisis", "Inflamasi dan toksin", "Adhesi ke jaringan dan pembentukan hifa", "Siklus hidup kompleks"], correct: 2, explanation: "Jamur bersifat adhesi ke jaringan dan membentuk hifa (filamen). Virus: replikasi & lisis. Bakteri: inflamasi & toksin. Parasit: siklus hidup kompleks." },
+      { q: "Infeksi nosokomial adalah infeksi yang?", options: ["Terjadi di masyarakat", "Terjadi di rumah sakit", "Disebabkan oleh virus saja", "Hanya pada bayi baru lahir"], correct: 1, explanation: "Infeksi nosokomial terjadi di rumah sakit, berasal dari fasilitas RS, tenaga kesehatan, atau pasien lain." },
+      { q: "Sterilisasi uap (autoklaf) memerlukan suhu dan tekanan?", options: ["100°C, 1 atm", "121°C, 106 kPa", "160°C, 2 jam", "180°C, 1 jam"], correct: 1, explanation: "Sterilisasi uap: 121°C dengan tekanan 106 kPa selama 20 menit (alat tidak terbungkus) atau 30 menit (terbungkus). Panas kering: 160–180°C." }
+    ]
+  },
+  {
+    id: "biokimia-1",
+    title: "Kuis Metabolisme Purin & Pirimidin",
+    category: "biokimia",
+    questions: [
+      { q: "Manusia mengkatabolisme purin menjadi asam urat karena?", options: ["Kelebihan enzim urikase", "Kekurangan enzim urikase", "Overproduksi PRPP", "Defisiensi HGPRT"], correct: 1, explanation: "Manusia tidak memiliki enzim urikase sehingga tidak dapat mengubah asam urat menjadi alantoin yang lebih larut." },
+      { q: "Enzim kunci regulasi de novo sintesis purin adalah?", options: ["Thymidine kinase", "PRPP glutamyl amidotransferase", "Carbamoyl phosphate synthase II", "Aspartate transcarbamoylase"], correct: 1, explanation: "PRPP glutamyl amidotransferase diatur feedback oleh AMP dan GMP. Carbamoyl phosphate synthase II dan aspartate transcarbamoylase untuk pirimidin." },
+      { q: "Defisiensi HGPRT menyebabkan penyakit?", options: ["Gout", "Orotic aciduria", "Lesch-Nyhan syndrome", "Diabetes"], correct: 2, explanation: "Defisiensi HGPRT (enzim salvage purin) menyebabkan Lesch-Nyhan syndrome: hiperurisemia, retardasi mental, perilaku automutilasi." },
+      { q: "Katabolisme pirimidin menghasilkan metabolit larut air berikut kecuali?", options: ["CO₂", "NH₃", "β-alanine", "Asam urat"], correct: 3, explanation: "Katabolisme pirimidin menghasilkan CO₂, NH₃, β-alanine, dan β-aminoisobutyrate. Asam urat adalah produk katabolisme purin." },
+      { q: "Enzim awal sintesis de novo pirimidin yang diinhibisi oleh UTP adalah?", options: ["PRPP sintase", "HGPRT", "Carbamoyl phosphate synthase II", "APRT"], correct: 2, explanation: "Carbamoyl phosphate synthase II (sitoplasmik) adalah enzim awal pirimidin yang diinhibisi oleh UTP dan diaktivasi oleh PRPP." }
+    ]
+  },
+  {
+    id: "imuno-1",
+    title: "Kuis Respon Imun Innate",
+    category: "imuno",
+    questions: [
+      { q: "PRR yang mengenali PAMPs dari bakteri Gram negatif (LPS) umumnya adalah?", options: ["NLR", "TLR", "CLR", "RLR"], correct: 1, explanation: "Toll-Like Receptors (TLR) adalah PRR yang mengenali LPS bakteri Gram negatif, flagelin, dsRNA virus, dan komponen patogen lainnya." },
+      { q: "Anafilatoksin yang menyebabkan degranulasi mastosit dan pelepasan histamin adalah?", options: ["C3b dan C4b", "C3a dan C5a", "C5-6-7", "C1q"], correct: 1, explanation: "C3a dan C5a adalah anafilatoksin yang menyebabkan degranulasi mastosit/basofil → histamin → ↑ permeabilitas vaskular dan edema." },
+      { q: "Sel yang berfungsi sebagai jembatan antara imunitas innate dan adaptive adalah?", options: ["Netrofil", "Sel dendritik", "Sel NK", "Eosinofil"], correct: 1, explanation: "Sel dendritik (APC profesional) menangkap antigen di jaringan, bermigrasi ke KGB, dan mempresentasikan antigen ke sel T (jembatan innate → adaptive)." },
+      { q: "Tahapan fagositosis yang benar adalah?", options: ["Ingesti → kemotaksis → digesti → ekskresi", "Kemotaksis & adhesi → ingesti → digesti → ekskresi", "Digesti → ingesti → kemotaksis → ekskresi", "Adhesi → ekskresi → ingesti → digesti"], correct: 1, explanation: "Tahapan fagositosis: kemotaksis & adhesi → ingesti (menelan) → digesti (fagolisosom) → ekskresi (sisa dikeluarkan)." },
+      { q: "Interferon tipe I (α dan β) berfungsi untuk?", options: ["Mengaktifkan sel B", "Menginduksi resistensi sel terhadap virus", "Menghancurkan bakteri Gram positif", "Menstimulasi produksi antibodi"], correct: 1, explanation: "IFN α/β diproduksi sel terinfeksi virus untuk memperingatkan sel tetangga agar resisten terhadap infeksi virus dan mengaktifkan sel NK." }
+    ]
+  },
+  {
+    id: "farmasi-1",
+    title: "Kuis Teknik Penulisan Resep",
+    category: "farmasi",
+    questions: [
+      { q: "Unsur resep yang berisi petunjuk penggunaan obat bagi pasien adalah?", options: ["Inscriptio", "Invocatio", "Signatura", "Subscriptio"], correct: 2, explanation: "Signatura (S.) adalah petunjuk cara pakai, regimen dosis, rute, dan interval waktu pemberian obat bagi pasien." },
+      { q: "Singkatan latin 'dtd' berarti?", options: ["Sehari", "Sedang makan", "Berikan sebanyak dosis tersebut", "Buat menurut cara semestinya"], correct: 2, explanation: "dtd = da tales doses (berikan sebanyak dosis tersebut). dd = diebus diurnis (sehari). dc = durante cibo (sedang makan). f.l.a = fiat lege artis." },
+      { q: "Formula magistralis adalah resep?", options: ["Yang tercantum dalam farmakope", "Racikan yang ditulis dokter dengan R/", "Yang menggunakan obat paten", "Yang ditulis apoteker"], correct: 1, explanation: "Formula magistralis adalah resep racikan yang ditulis dokter dengan tanda R/ (Recipe = ambillah). Officinalis dari farmakope. Spesialistic menggunakan obat paten." },
+      { q: "Yang berhak menulis resep untuk hewan adalah?", options: ["Dokter umum", "Dokter gigi", "Dokter hewan", "Apoteker"], correct: 2, explanation: "Dokter hewan berhak menulis resep terbatas untuk hewan. Dokter umum/spesialis untuk manusia. Dokter gigi terbatas gigi & mulut." },
+      { q: "Resep cito ditandai dengan?", options: ["Tanda R/ besar", "Tulisan CITO!", "Lingkaran merah", "Paraf ganda"], correct: 1, explanation: "Resep cito diberi tanda CITO! di bagian atas untuk pasien gawat yang harus didahulukan pembuatannya." }
+    ]
+  },
+  {
+    id: "imuno-2",
+    title: "Kuis Respon Imun terhadap Patogen",
+    category: "imuno",
+    questions: [
+      { q: "Imunitas utama terhadap bakteri intraselular adalah?", options: ["Antibodi IgA", "Imunitas humoral", "Imunitas sel-mediated (sel T)", "Komplemen jalur klasik"], correct: 2, explanation: "Bakteri intraselular (Mycobacteria, Listeria) tidak terjangkau antibodi sehingga diperlukan imunitas sel-mediated (CD4 Th1 dan CD8 CTL)." },
+      { q: "Sel yang membunuh sel terinfeksi virus melalui MHC I adalah?", options: ["Sel B", "CD4 Th", "CD8 CTL", "Makrofag"], correct: 2, explanation: "CD8 Cytotoxic T Lymphocyte (CTL) mengenali peptida antigen pada MHC kelas I dan membunuh sel yang terinfeksi virus." },
+      { q: "Strategi evasi virus yang mengubah protein target antibodi disebut?", options: ["Disrupt interferon", "Antigenic drift & shift", "Encode MHC homolog", "Kontrol ekspresi sitokin"], correct: 1, explanation: "Antigenic drift (mutasi kecil) dan shift (perubahan besar) menyebabkan variasi antigen sehingga antibodi tidak mengenali virus (HIV, influenza)." },
+      { q: "Respon imun terhadap helmintes (cacing) condong ke arah?", options: ["Th1", "Th2", "Th17", "Treg"], correct: 1, explanation: "Infeksi cacing condong menstimulasi respon Th2 yang melibatkan IgE, eosinofil, dan sitokin seperti IL-4, IL-5, IL-13." },
+      { q: "Vaksin polio Salk termasuk jenis?", options: ["Vaksin hidup", "Vaksin mati", "Vaksin subunit", "Vaksin DNA"], correct: 1, explanation: "Polio Salk adalah vaksin mati (inactivated). Polio Sabin adalah vaksin hidup (live attenuated)." }
+    ]
+  },
+  {
+    id: "imuno-3",
+    title: "Kuis Konsep Dasar Sel & Jaringan Imun",
+    category: "imuno",
+    questions: [
+      { q: "Sel yang menghasilkan antibodi spesifik adalah?", options: ["Sel T helper", "Sel plasma", "Makrofag", "Sel NK"], correct: 1, explanation: "Sel B berdiferensiasi menjadi sel plasma yang mampu memproduksi imunoglobulin (antibodi) spesifik terhadap antigen." },
+      { q: "Opsonin pada jalur komplemen adalah?", options: ["C3a dan C5a", "C3b dan C4b", "C1qrs", "C5-6-7"], correct: 1, explanation: "C3b dan C4b berfungsi sebagai opsonin (jembatan antara antigen dan reseptor fagosit) sehingga fagositosis lebih mudah." },
+      { q: "Sitotoksik terhadap virus dan sel tumor tanpa bantuan antibodi dilakukan oleh?", options: ["Sel B", "Sel Tc", "Sel NK", "Eosinofil"], correct: 2, explanation: "Sel NK (Natural Killer) membunuh sel tumor dan sel terinfeksi virus secara non spesifik tanpa bantuan antibodi atau MHC." },
+      { q: "Lisozim pada keringat dan air mata melindungi terhadap?", options: ["Bakteri Gram negatif", "Bakteri Gram positif", "Virus", "Jamur"], correct: 1, explanation: "Lisozim merusak peptidoglikan dinding sel bakteri Gram positif. Kurang efektif terhadap Gram negatif karena memiliki membran luar." },
+      { q: "Perbedaan utama imunitas spesifik dan non spesifik adalah?", options: ["Non spesifik memiliki memori", "Spesifik memerlukan waktu hari dan memori", "Spesifik selalu siap tanpa pajanan", "Non spesifik menggunakan antibodi"], correct: 1, explanation: "Imunitas spesifik memerlukan waktu hari (lambat), memiliki memori, dan spesifik untuk antigen tertentu. Non spesifik menit/jam, selalu siap, umum." }
+    ]
+  },
+  {
+    id: "gizi-1",
+    title: "Kuis Penilaian Status Gizi",
+    category: "gizi",
+    questions: [
+      { q: "Ambang batas LILA WUS dengan risiko KEK adalah?", options: ["21,5 cm", "23,5 cm", "25,5 cm", "28,0 cm"], correct: 1, explanation: "Ambang batas LILA WUS dengan risiko KEK (Kekurangan Energi Kronis) adalah 23,5 cm. Kurang dari itu berisiko melahirkan BBLR." },
+      { q: "Pengukuran tinggi badan bayi 0–2 tahun menggunakan?", options: ["Mikrotois", "Stadiometer", "Panjang badan", "Kaliper"], correct: 2, explanation: "Bayi 0–2 tahun diukur panjang badan (lying length). Anak >2 tahun dan dewasa menggunakan mikrotois/stadiometer berdiri." },
+      { q: "Mikrosefali didefinisikan sebagai lingkar kepala?", options: ["> +2SD", "< -2SD", "35 cm", "40 cm"], correct: 1, explanation: "Mikrosefali adalah kondisi lingkar kepala bayi < -2SD dari rata-rata normal. Penyebab: TORCH, alkohol, atrofi otak." },
+      { q: "RLPP (Waist to Hip Ratio) dihitung dengan rumus?", options: ["LP + LPg", "LP / LPg", "LPg / LP", "TB / BB"], correct: 1, explanation: "RLPP = Lingkar Pinggang (LP) dibagi Lingkar Panggul (LPg). Nilai >1 pada pria menunjukkan risiko sindrom metabolik." },
+      { q: "Pengukuran tebal lemak bawah kulit (TLBK) menggunakan alat?", options: ["Timbangan", "Stadiometer", "Kaliper (caliper)", "Pita LILA"], correct: 2, explanation: "TLBK/skinfold diukur menggunakan kaliper (caliper) pada berbagai lokasi (tricep, bicep, subskapular, suprailiak, dll)." }
+    ]
+  },
+  {
+    id: "patologi-1",
+    title: "Kuis Wound Healing",
+    category: "patologi",
+    questions: [
+      { q: "Fase hemostasis terjadi pada rentang waktu?", options: ["Hari 1–3", "Menit–jam", "Hari 3–21", "Minggu–bulan"], correct: 1, explanation: "Hemostasis terjadi segera setelah luka (menit–jam): vasokonstriksi, aktivasi platelet, pembentukan clot fibrin." },
+      { q: "Sel key regulator pada fase inflamasi yang memproduksi VEGF dan TGF-β adalah?", options: ["Neutrofil", "Makrofag", "Fibroblas", "Sel endotel"], correct: 1, explanation: "Makrofag adalah key regulator fase inflamasi yang memproduksi VEGF, FGF, TGF-β, dan mengaktifkan fibroblas." },
+      { q: "Kolagen yang diproduksi pada fase proliferasi awal adalah?", options: ["Tipe I", "Tipe II", "Tipe III", "Tipe IV"], correct: 2, explanation: "Pada fase proliferasi awal, fibroblas memproduksi kolagen tipe III yang masih lemah. Pada remodeling berubah menjadi tipe I yang kuat." },
+      { q: "Perbedaan keloid dan hypertrophic scar adalah?", options: ["Keloid terbatas dalam batas luka, hypertrophic meluas", "Keloid melampaui batas luka, hypertrophic terbatas", "Keduanya sama", "Hypertrophic hanya pada wajah"], correct: 1, explanation: "Keloid: pertumbuhan jaringan parut melampaui batas luka original. Hypertrophic scar: penebalan terbatas dalam batas luka." },
+      { q: "Faktor sistemik yang menghambat penyembuhan luka adalah?", options: ["Nutrisi baik", "Diabetes", "Adekuat oksigen", "Usia muda"], correct: 1, explanation: "Diabetes mellitus, nutrisi buruk, usia lanjut, dan penggunaan steroid adalah faktor sistemik yang menghambat wound healing." }
+    ]
+  }
+];
+
+const examsData = [
+  {
+    id: "exam-blok1",
+    title: "Ujian Komprehensif Blok 1",
+    description: "30 soal pilihan ganda • 60 menit • Farmakologi, Mikrobiologi, Biokimia",
+    questions: [
+      { q: "Obat dengan tanda lingkaran biru dan garis tepi hitam termasuk?", options: ["Obat bebas", "Obat bebas terbatas", "Obat keras", "Narkotika"], correct: 1, explanation: "Lingkaran biru dengan garis tepi hitam adalah tanda obat bebas terbatas (disertai peringatan)." },
+      { q: "Rumus Clark untuk dosis anak berdasarkan?", options: ["Usia", "Berat badan", "Luas permukaan tubuh", "Tinggi badan"], correct: 1, explanation: "Rumus Clark: w/70 x dosis dewasa, dengan w = berat badan anak dalam kg." },
+      { q: "Virus bersifat intraseluler obligat karena?", options: ["Memiliki ribosom sendiri", "Hanya dapat replikasi di dalam sel hidup", "Memiliki dinding sel", "Dapat hidup di luar sel dalam bentuk spora"], correct: 1, explanation: "Virus bersifat intraseluler obligat karena tidak memiliki metabolisme sendiri dan hanya dapat bereplikasi di dalam sel hidup." },
+      { q: "Tahapan fagositosis setelah ingesti adalah?", options: ["Kemotaksis", "Digesti", "Ekskresi", "Adhesi"], correct: 1, explanation: "Tahapan: kemotaksis & adhesi → ingesti → digesti (fagolisosom) → ekskresi." },
+      { q: "Enzim yang tidak dimiliki manusia dalam katabolisme purin adalah?", options: ["Xantin oksidase", "Urikase", "Adenin fosforibosiltransferase", "HGPRT"], correct: 1, explanation: "Manusia tidak memiliki urikase sehingga purin dikatabolisme menjadi asam urat, bukan alantoin." },
+      { q: "PPI (omeprazole) bekerja dengan cara?", options: ["Memblok reseptor H2", "Menghambat pompa proton H+/K+-ATPase", "Menetralkan asam lambung", "Menstimulasi mukus"], correct: 1, explanation: "PPI adalah proton pump inhibitor yang menghambat pompa proton di sel parietal gaster." },
+      { q: "Sterilisasi dengan autoklaf menggunakan suhu?", options: ["100°C", "121°C", "160°C", "180°C"], correct: 1, explanation: "Autoklaf menggunakan suhu 121°C dengan tekanan 106 kPa selama 20–30 menit." },
+      { q: "Defisiensi HGPRT menyebabkan?", options: ["Gout primer", "Lesch-Nyhan syndrome", "Orotic aciduria", "Skorbut"], correct: 1, explanation: "Defisiensi HGPRT (enzim salvage purin) menyebabkan Lesch-Nyhan syndrome dengan hiperurisemia dan perilaku automutilasi." },
+      { q: "PRR yang mengenali LPS bakteri Gram negatif adalah?", options: ["NLR", "TLR", "CLR", "RLR"], correct: 1, explanation: "Toll-Like Receptors (TLR), terutama TLR4, mengenali LPS dari bakteri Gram negatif." },
+      { q: "Obat esensial menurut WHO harus memiliki rasio?", options: ["Manfaat-risiko menguntungkan", "Harga termahal", "Efek samping nol", "Dosis tunggal"], correct: 0, explanation: "Kriteria obat esensial WHO: rasio manfaat-risiko paling menguntungkan pasien, mutu terjamin, praktis, dan rasio manfaat-biaya tertinggi." },
+      { q: "Mekanisme utama bakteri intraselular menghindari antibodi adalah?", options: ["Membentuk kapsul tebal", "Hidup di dalam sel fagosit", "Memproduksi eksotoksin", "Bergerak dengan flagela"], correct: 1, explanation: "Bakteri intraselular (Mycobacteria, Listeria) bertahan di dalam sel fagosit sehingga tidak terjangkau antibodi." },
+      { q: "Katabolisme pirimidin menghasilkan?", options: ["Asam urat", "β-alanine dan CO₂", "Kreatinin", "Bilirubin"], correct: 1, explanation: "Katabolisme pirimidin menghasilkan CO₂, NH₃, β-alanine, dan β-aminoisobutyrate." },
+      { q: "Tanda R/ pada resep berarti?", options: ["Recipe = ambillah", "Repeat = ulangi", "Recipe = resep", "Ratio = perbandingan"], correct: 0, explanation: "R/ berasal dari Latin 'Resipe' yang berarti 'ambillah' atau 'berikanlah'." },
+      { q: "Sel NK membunuh sel tumor dengan cara?", options: ["Menggunakan antibodi spesifik", "Secara non spesifik tanpa antibodi", "Melalui fagositosis", "Dengan memori imun"], correct: 1, explanation: "Sel NK (Natural Killer) membunuh sel tumor dan sel terinfeksi virus secara non spesifik tanpa bantuan antibodi atau MHC." },
+      { q: "Jalur komplemen yang dipicu oleh kompleks antigen-antibodi adalah?", options: ["Jalur klasik", "Jalur alternatif", "Jalur MBL", "Jalur terminal"], correct: 0, explanation: "Jalur klasik diaktifkan oleh kompleks antigen-antibodi (IgG1-3, IgM) yang mengikat C1q." },
+      { q: "Antihistamin generasi kedua (cetirizine) memiliki kelebihan?", options: ["Lebih murah", "Tidak mengantuk karena sulit menembus otak", "Lebih cepat metabolismo", "Dapat dibeli tanpa resep"], correct: 1, explanation: "Antihistamin generasi kedua (loratadine, cetirizine) relatif tidak menembus BBB sehingga efek sedatif/mengantuk minimal." },
+      { q: "Narkotika Golongan I menurut UU 35/2009?", options: ["Banyak digunakan dalam terapi", "Hanya untuk ilmu pengetahuan", "Potensi ringan", "Tidak berbahaya"], correct: 1, explanation: "Gol I: narkotika yang hanya untuk pengembangan ilmu pengetahuan, tidak untuk terapi, potensi sangat tinggi (ganja, kokain)." },
+      { q: "Interferon tipe I diproduksi oleh?", options: ["Sel T helper", "Sel yang terinfeksi virus", "Sel B", "Makrofag saja"], correct: 1, explanation: "IFN α dan β (tipe I) diproduksi oleh hampir semua sel nukleated yang terinfeksi virus." },
+      { q: "Vaksin polio Sabin termasuk?", options: ["Vaksin mati", "Vaksin hidup attenuated", "Vaksin subunit", "Vaksin toxoid"], correct: 1, explanation: "Polio Sabin adalah vaksin hidup (live attenuated oral vaccine). Polio Salk adalah vaksin mati (inactivated)." },
+      { q: "Tujuan dekontaminasi peralatan medis adalah?", options: ["Sterilisasi total", "Membuat objek aman ditangani sebelum dibersihkan", "Membersihkan darah", "Membunuh semua spora"], correct: 1, explanation: "Dekontaminasi membuat objek mati lebih aman ditangani staff sebelum dibersihkan (menginaktivasi HBV, HIV)." },
+      { q: "Rumus Gaubius untuk usia 1–2 tahun?", options: ["1/12 dosis dewasa", "1/8 dosis dewasa", "1/6 dosis dewasa", "1/3 dosis dewasa"], correct: 1, explanation: "Menurut Gaubius: usia 1–2 tahun = 1/8 dosis dewasa." },
+      { q: "Opsonin pada sistem komplemen adalah?", options: ["C3a", "C3b dan C4b", "C5a", "C1q"], correct: 1, explanation: "C3b dan C4b berfungsi sebagai opsonin yang melapisi antigen sehingga mudah difagosit." },
+      { q: "Respon imun terhadap cacing (helmintes) didominasi oleh?", options: ["Th1", "Th2", "Th17", "Treg"], correct: 1, explanation: "Infeksi cacing condong ke respons Th2 dengan produksi IgE, aktivasi eosinofil, dan sitokin IL-4/IL-5." },
+      { q: "Bahasa latin digunakan dalam resep karena?", options: ["Lebih mudah dipahami pasien", "Bahasa mati dan internasional", "Hanya digunakan di Indonesia", "Lebih singkat dari bahasa Indonesia"], correct: 1, explanation: "Bahasa latin adalah bahasa mati (tidak ambigu), bahasa internasional kedokteran & farmasi, dan menghindari dualisme interpretasi." },
+      { q: "Anafilatoksin yang menyebabkan pelepasan histamin dari mastosit adalah?", options: ["C3b", "C3a dan C5a", "C4b", "C1qrs"], correct: 1, explanation: "C3a dan C5a adalah anafilatoksin yang menyebabkan degranulasi mastosit → histamin → vasodilatasi dan edema." },
+      { q: "Enzim awal de novo pirimidin yang diaktivasi PRPP adalah?", options: ["PRPP sintase", "Carbamoyl phosphate synthase II", "HGPRT", "Thymidine kinase"], correct: 1, explanation: "Carbamoyl phosphate synthase II (sitoplasmik) diaktivasi oleh PRPP dan diinhibisi oleh UTP." },
+      { q: "Tanda peringatan pada obat bebas terbatas berjumlah?", options: ["3 macam", "4 macam", "5 macam", "6 macam"], correct: 3, explanation: "Tanda peringatan pada obat bebas terbatas berupa empat persegi panjang dengan huruf putih di dasar hitam, terdiri dari 6 macam (P. No. 1–6)." },
+      { q: "Sel dendritik berperan sebagai?", options: ["Fagosit saja", "APC dan jembatan innate-adaptive", "Sel pembunuh virus", "Produsen antibodi"], correct: 1, explanation: "Sel dendritik adalah Antigen Presenting Cell (APC) profesional yang menjadi jembatan antara imunitas innate dan adaptive." },
+      { q: "Proses uncoating pada siklus virus adalah?", options: ["Virus masuk ke sel", "Pelepasan selubung virus & enzim", "Perakitan virus baru", "Virus keluar dari sel"], correct: 1, explanation: "Uncoating adalah pelepasan selubung virus dan pelepasan asam nukleat/enzim ke dalam sitoplasma sel inang." }
+    ]
+  },
+  {
+    id: "exam-blok2",
+    title: "Ujian Komprehensif Blok 2",
+    description: "30 soal pilihan ganda • 60 menit • Imunologi, Gizi, Farmasi, Patologi",
+    questions: [
+      { q: "Lisozim pada air mata dan keringat melindungi dari?", options: ["Bakteri Gram negatif", "Bakteri Gram positif", "Virus influenza", "Jamur"], correct: 1, explanation: "Lisozim menghancurkan peptidoglikan dinding sel bakteri Gram positif." },
+      { q: "Ambang batas LILA untuk WUS berisiko KEK adalah?", options: ["21,5 cm", "23,5 cm", "25,0 cm", "28,0 cm"], correct: 1, explanation: "Ambang batas LILA WUS dengan risiko KEK adalah 23,5 cm. Kurang dari itu berisiko melahirkan BBLR." },
+      { q: "Unsur resep yang berisi nama dan alamat dokter adalah?", options: ["Invocatio", "Inscriptio", "Signatura", "Pro"], correct: 1, explanation: "Inscriptio berisi nama, alamat, SIP dokter, dan tanggal penulisan resep." },
+      { q: "Fase remodeling pada wound healing ditandai dengan?", options: ["Pembentukan fibrin clot", "Penggantian kolagen III menjadi I", "Dominasi neutrofil", "Vasodilatasi"], correct: 1, explanation: "Remodeling: kolagen tipe III diganti dengan tipe I, meningkatkan tensile strength, mengurangi vaskularisasi." },
+      { q: "Sel yang membunuh sel terinfeksi virus melalui MHC I adalah?", options: ["CD4 Th", "CD8 CTL", "Sel B", "Makrofag"], correct: 1, explanation: "CD8 Cytotoxic T Lymphocyte mengenali antigen pada MHC kelas I dan membunuh sel terinfeksi virus." },
+      { q: "Kemotaksin pada sistem komplemen meliputi?", options: ["C3b dan C4b", "C3a, C5a, dan C5-6-7", "C1qrs", "C8-9"], correct: 1, explanation: "C3a, C5a, dan C5-6-7 bersifat kemotaksis (menarik sel fagosit ke tempat infeksi)." },
+      { q: "Pengukuran tinggi lutut (knee height) digunakan untuk?", options: ["Bayi baru lahir", "Lansia yang bungkuk", "Atlet", "Anak balita"], correct: 1, explanation: "Tinggi lutut digunakan untuk estimasi tinggi badan pada lansia atau klien yang tidak dapat berdiri tegak karena bungkuk/kelainan tulang." },
+      { q: "Formula officinalis adalah resep?", options: ["Racikan dokter", "Yang tercantum dalam farmakope", "Obat paten", "Resep elektronik"], correct: 1, explanation: "Formula officinalis adalah resep yang tercantum dalam farmakope atau buku standar resmi." },
+      { q: "Keloid pada luka ditandai dengan?", options: ["Pertumbuhan terbatas dalam batas luka", "Pertumbuhan melampaui batas luka", "Tidak ada pertumbuhan jaringan parut", "Hanya terjadi pada luka bakar"], correct: 1, explanation: "Keloid adalah pertumbuhan jaringan parut yang melampaui batas luka original. Hypertrophic scar terbatas dalam batas luka." },
+      { q: "Antibodi yang paling efektif untuk aktivasi komplemen jalur klasik adalah?", options: ["IgA", "IgE", "IgG1-3 dan IgM", "IgD"], correct: 2, explanation: "IgM dan subkelas IgG1, IgG2, IgG3 paling efektif mengaktifkan jalur klasik komplemen melalui pengikatan C1q." },
+      { q: "CRP (C-Reactive Protein) merupakan?", options: ["Protein fase akut", "Hormon steroid", "Enzim pencernaan", "Antibodi spesifik"], correct: 0, explanation: "CRP adalah protein fase akut yang kadarnya meningkat saat infeksi akut atau kerusakan jaringan, berfungsi opsonisasi." },
+      { q: "Pengukuran skinfold (TLBK) menggunakan alat?", options: ["Stadiometer", "Timbangan analitik", "Kaliper (caliper)", "Mikrotois"], correct: 2, explanation: "Tebal lemak bawah kulit diukur dengan kaliper (caliper) pada lokasi standar seperti tricep, bicep, subskapular." },
+      { q: "Resep cito ditandai dengan tulisan?", options: ["STAT!", "CITO!", "URGENT!", "ASAP!"], correct: 1, explanation: "Resep cito diberi tanda 'CITO!' untuk pasien gawat yang harus didahulukan." },
+      { q: "Fase proliferasi pada wound healing meliputi kecuali?", options: ["Angiogenesis", "Fibroplasia", "Hemostasis", "Re-epithelialization"], correct: 2, explanation: "Hemostasis adalah fase tersendiri (menit–jam). Proliferasi (hari 3–21) meliputi angiogenesis, fibroplasia, re-epithelialization, dan granulasi." },
+      { q: "Sel NK diaktivasi oleh?", options: ["Antibodi spesifik", "Interferon", "Komplemen C3b", "Histamin"], correct: 1, explanation: "Sel NK diaktivasi oleh interferon (terutama IFN α/β) yang diproduksi sel terinfeksi virus." },
+      { q: "Rasio lingkar pinggang dan panggul (RLPP) >1 pada pria menunjukkan?", options: ["Status gizi baik", "Risiko sindrom metabolik", "Kekurangan energi", "Obesitas sentral saja"], correct: 1, explanation: "RLPP >1 pada pria menunjukkan risiko sindrom metabolik (hipertensi, DM, jantung koroner) akibat akumulasi lemak visceral." },
+      { q: "Imunitas bawaan terhadap bakteri ekstraseluler utama adalah?", options: ["Imunitas sel-mediated", "Aktivasi komplemen, fagositosis, radang", "Antibodi IgE", "Memori imun"], correct: 1, explanation: "Terhadap bakteri ekstraseluler, imunitas bawaan mengandalkan aktivasi komplemen (jalur alternatif/lektil), fagositosis, dan respon radang." },
+      { q: "Mikrosefali didefinisikan sebagai lingkar kepala?", options: ["> +2SD", "< -2SD", "Sama dengan rata-rata", "35 cm pasti"], correct: 1, explanation: "Mikrosefali adalah lingkar kepala < -2SD dari nilai rata-rata standar pertumbuhan." },
+      { q: "Bahasa latin dalam signatura digunakan untuk?", options: ["Nama dokter", "Petunjuk aturan pakai", "Alamat apotek", "Nomor SIP"], correct: 1, explanation: "Signatura menggunakan bahasa latin/singkatan untuk petunjuk cara pakai, dosis, dan waktu pemberian obat." },
+      { q: "Platelet pada hemostasis melepaskan growth factor?", options: ["VEGF dan EGF", "PDGF dan TGF-β", "IGF dan FGF", "NGF dan G-CSF"], correct: 1, explanation: "Platelet melepaskan PDGF (Platelet-Derived Growth Factor) dan TGF-β (Transforming Growth Factor-beta) untuk memulai kaskade penyembuhan luka." },
+      { q: "Eosinofil berperan dalam?", options: ["Infeksi virus", "Infeksi parasit/cacing", "Infeksi bakteri Gram negatif", "Produksi antibodi"], correct: 1, explanation: "Eosinofil berperan melawan infeksi parasit (helmintes) melalui pelepasan Major Basic Protein (MBP) dan Eosinophil Peroxidase (EPO)." },
+      { q: "Vaksin hepatitis A termasuk?", options: ["Vaksin hidup", "Vaksin mati", "Vaksin DNA", "Vaksin subunit"], correct: 1, explanation: "Hepatitis A adalah vaksin mati (inactivated). Vaksin hidup meliputi measles, mumps, rubella, varicella, polio Sabin, yellow fever." },
+      { q: "Defisiensi carbamoyl phosphate synthase II akan mengganggu?", options: ["Sintesis purin", "Sintesis pirimidin", "Sintesis hem", "Sintesis kolagen"], correct: 1, explanation: "Carbamoyl phosphate synthase II adalah enzim awal dan kunci dalam sintesis de novo pirimidin." },
+      { q: "Lingkar kepala bayi laki-laki baru lahir menurut CDC 2000 adalah?", options: ["35 cm", "36 cm", "37 cm", "38 cm"], correct: 1, explanation: "Menurut CDC 2000, lingkar kepala bayi laki-laki baru lahir idealnya 36 cm, dan pada usia 3 bulan menjadi 41 cm." },
+      { q: "Myofibroblast berperan dalam wound healing pada proses?", options: ["Hemostasis", "Wound contraction", "Angiogenesis", "Opsonisasi"], correct: 1, explanation: "Myofibroblast berkontraksi menyebabkan wound contraction (penarikan tepi luka) pada fase proliferasi." },
+      { q: "Yang bukan faktor lokal yang menghambat wound healing?", options: ["Infeksi", "Ischemia", "Diabetes", "Foreign body"], correct: 2, explanation: "Diabetes adalah faktor sistemik, bukan lokal. Faktor lokal: infeksi, iskemia, benda asing, tekanan." },
+      { q: "Sel T helper membantu sel B dalam?", options: ["Fagositosis", "Produksi antibodi", "Membunuh virus langsung", "Mengaktifkan komplemen"], correct: 1, explanation: "Sel T helper (CD4) membantu sel B dalam memproduksi antibodi melalui signal kostimulasi dan sitokin." }
+    ]
+  }
+];
+
+const flashcardsData = [
+  { id: "f1", category: "farmako", front: "Apa tanda obat bebas menurut Permenkes?", back: "Lingkaran hijau dengan garis tepi hitam." },
+  { id: "f2", category: "farmako", front: "Apa perbedaan obat bebas terbatas dan obat keras?", back: "Bebas terbatas: lingkaran biru, dengan peringatan. Keras: lingkaran merah huruf K, hanya dengan resep dokter." },
+  { id: "f3", category: "farmako", front: "Rumus Young untuk dosis anak?", back: "n/(n+12) x dosis dewasa, n = umur dalam tahun." },
+  { id: "f4", category: "farmako", front: "Apa itu PPI?", back: "Proton Pump Inhibitor, menghambat pompa proton di sel gaster (omeprazole, lansoprazole)." },
+  { id: "f5", category: "mikro", front: "5 tanda cardinal infeksi?", back: "Rubor, Kalor, Dolor, Tumor, Fungsio laesa." },
+  { id: "f6", category: "mikro", front: "Mekanisme utama virus?", back: "Replikasi dan lisis: adsorpsi → penetrasi → uncoating → replikasi → assembly → release." },
+  { id: "f7", category: "mikro", front: "Apa itu infeksi nosokomial?", back: "Infeksi yang terjadi di rumah sakit, berasal dari fasilitas RS, tenaga kesehatan, atau pasien lain." },
+  { id: "f8", category: "mikro", front: "Suhu dan tekanan autoklaf?", back: "121°C, 106 kPa, selama 20–30 menit." },
+  { id: "f9", category: "biokimia", front: "Mengapa manusia memproduksi asam urat?", back: "Karena kekurangan enzim urikase, sehingga purin dikatabolisme menjadi asam urat." },
+  { id: "f10", category: "biokimia", front: "Enzim kunci regulasi sintesis purin?", back: "PRPP glutamyl amidotransferase (diinhibisi feedback oleh AMP dan GMP)." },
+  { id: "f11", category: "biokimia", front: "Penyakit akibat defisiensi HGPRT?", back: "Lesch-Nyhan syndrome: hiperurisemia, retardasi mental, automutilasi." },
+  { id: "f12", category: "biokimia", front: "Enzim awal sintesis pirimidin?", back: "Carbamoyl phosphate synthase II (sitoplasmik)." },
+  { id: "f13", category: "imuno", front: "Apa itu PAMPs?", back: "Pathogen-Associated Molecular Patterns, molekul pathogen yang dikenali PRR (LPS, flagelin, dsRNA)." },
+  { id: "f14", category: "imuno", front: "4 jenis PRR?", back: "TLR, NLR, CLR, RLR." },
+  { id: "f15", category: "imuno", front: "Apa fungsi C3b dan C4b?", back: "Opsonin: melapisi antigen sehingga mudah difagosit." },
+  { id: "f16", category: "imuno", front: "Anafilatoksin pada komplemen?", back: "C3a dan C5a → degranulasi mastosit → histamin → edema." },
+  { id: "f17", category: "imuno", front: "Sel jembatan innate-adaptive?", back: "Sel dendritik (APC profesional)." },
+  { id: "f18", category: "imuno", front: "Fungsi sel NK?", back: "Membunuh sel tumor dan sel terinfeksi virus secara non spesifik tanpa antibodi." },
+  { id: "f19", category: "farmasi", front: "Unsur resep: Inscriptio berisi?", back: "Nama, alamat, SIP dokter, tanggal." },
+  { id: "f20", category: "farmasi", front: "Apa arti R/ pada resep?", back: "Resipe = ambillah/berikanlah." },
+  { id: "f21", category: "farmasi", front: "Singkatan 'dtd' artinya?", back: "Da tales doses = berikan sebanyak dosis tersebut." },
+  { id: "f22", category: "farmasi", front: "Yang berhak menulis resep?", back: "Dokter, dokter gigi (terbatas), dokter hewan (terbatas)." },
+  { id: "f23", category: "imuno", front: "CD8 CTL berfungsi untuk?", back: "Membunuh sel yang terinfeksi virus melalui pengenalan antigen pada MHC I." },
+  { id: "f24", category: "imuno", front: "Respons imun terhadap cacing condong ke?", back: "Th2 (IgE, eosinofil, IL-4/IL-5)." },
+  { id: "f25", category: "gizi", front: "Ambang batas LILA WUS risiko KEK?", back: "23,5 cm." },
+  { id: "f26", category: "gizi", front: "Alat ukur TLBK?", back: "Kaliper (caliper) pada lokasi tricep, bicep, subskapular, suprailiak." },
+  { id: "f27", category: "gizi", front: "Mikrosefali adalah lingkar kepala?", back: "< -2SD dari rata-rata normal." },
+  { id: "f28", category: "patologi", front: "Fase hemostasis terjadi kapan?", back: "Menit–jam setelah luka: vasokonstriksi, platelet, fibrin clot." },
+  { id: "f29", category: "patologi", front: "Perbedaan keloid dan hypertrophic scar?", back: "Keloid melampaui batas luka; hypertrophic terbatas dalam batas luka." },
+  { id: "f30", category: "patologi", front: "Fase remodeling ditandai dengan?", back: "Kolagen III → I, meningkatkan tensile strength, berkurang vaskularisasi." }
+];
+
+// ===================== STATE =====================
+function getDefaultState() {
+  return {
+    currentPage: "dashboard",
+    selectedMaterialId: null,
+    selectedQuizId: null,
+    selectedExamId: null,
+    streak: 3,
+    totalCorrect: 0,
+    materialsProgress: {},
+    quizScores: {},
+    examHistory: [],
+    notes: {},
+    focusTime: 0,
+    activities: [
+      {id:"a1", type:"material", description:"Farmakologi — Penggolongan Obat", time:"1 jam lalu"},
+      {id:"a2", type:"quiz", description:"Kuis Imun Innate — 5/5 benar", time:"3 jam lalu"},
+      {id:"a3", type:"pomodoro", description:"Pomodoro — 25 menit", time:"Kemarin"}
+    ]
+  };
+}
+
+function loadState() {
+  try {
+    const raw = localStorage.getItem("medstudy-blok-v1");
+    if (raw) return { ...getDefaultState(), ...JSON.parse(raw) };
+  } catch(e) {}
+  return getDefaultState();
+}
+
+let state = loadState();
+
+function saveState() {
+  localStorage.setItem("medstudy-blok-v1", JSON.stringify(state));
+}
+
+// ===================== NAVIGATION =====================
+function navigate(page, params = {}) {
+  state.currentPage = page;
+  if (params.materialId) state.selectedMaterialId = params.materialId;
+  if (params.quizId) state.selectedQuizId = params.quizId;
+  if (params.examId) state.selectedExamId = params.examId;
+  saveState();
+  render();
+  window.scrollTo({ top: 0, behavior: "smooth" });
+}
+
+function render() {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  const pageEl = document.getElementById('page-' + state.currentPage);
+  if (pageEl) pageEl.classList.add('active');
+
+  document.querySelectorAll('[id^="nav-"]').forEach(el => {
+    const page = el.id.replace('nav-', '');
+    const underline = el.querySelector('.nav-underline');
+    if (page === state.currentPage || (page === 'materials' && state.currentPage === 'material-detail') || (page === 'quiz' && state.currentPage === 'quiz-run') || (page === 'exam' && state.currentPage === 'exam-run')) {
+      el.classList.remove('text-text-dim');
+      el.classList.add('text-text');
+      if (underline) { underline.style.opacity = '1'; underline.classList.add('nav-glow'); }
+    } else {
+      el.classList.add('text-text-dim');
+      el.classList.remove('text-text');
+      if (underline) { underline.style.opacity = '0'; underline.classList.remove('nav-glow'); }
+    }
+  });
+
+  if (state.currentPage === 'dashboard') renderDashboard();
+  if (state.currentPage === 'materials') renderMaterials();
+  if (state.currentPage === 'material-detail') renderMaterialDetail();
+  if (state.currentPage === 'quiz') renderQuizList();
+  if (state.currentPage === 'quiz-run') renderQuizRun();
+  if (state.currentPage === 'quiz-result') renderQuizResult();
+  if (state.currentPage === 'exam') renderExamList();
+  if (state.currentPage === 'exam-run') renderExamRun();
+  if (state.currentPage === 'exam-result') renderExamResult();
+  if (state.currentPage === 'flashcards') renderFlashcards();
+  if (state.currentPage === 'settings') renderSettings();
+}
+
+// ===================== DASHBOARD =====================
+function renderDashboard() {
+  document.getElementById('dash-streak').textContent = state.streak + ' hari';
+  document.getElementById('dash-correct').textContent = state.totalCorrect + ' soal';
+  document.getElementById('dash-focus').textContent = state.focusTime + ' menit';
+  const completed = Object.values(state.materialsProgress).filter(p => p >= 100).length;
+  document.getElementById('dash-progress').textContent = completed + '/' + materialsData.length;
+
+  const actContainer = document.getElementById('activity-list');
+  actContainer.innerHTML = state.activities.slice(0, 6).map(a => {
+    let icon = '';
+    if (a.type === 'material') icon = '<svg class="w-4 h-4 text-cyan" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>';
+    else if (a.type === 'quiz') icon = '<svg class="w-4 h-4 text-success" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>';
+    else if (a.type === 'pomodoro') icon = '<svg class="w-4 h-4 text-danger" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>';
+    else icon = '<svg class="w-4 h-4 text-warning" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="2" y="3" width="20" height="14" rx="2" ry="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg>';
+    return `<div class="flex items-center gap-3 p-3 rounded-lg bg-surface/50 border border-cyan/10">
+      <div class="w-8 h-8 rounded-lg bg-cyan/10 flex items-center justify-center shrink-0">${icon}</div>
+      <div class="flex-1 min-w-0"><div class="text-sm text-text truncate">${a.description}</div><div class="text-xs text-text-dim">${a.time}</div></div>
+    </div>`;
+  }).join('');
+
+  const progContainer = document.getElementById('progress-list');
+  progContainer.innerHTML = materialsData.map(m => {
+    const prog = state.materialsProgress[m.id] || 0;
+    return `<div>
+      <div class="flex justify-between text-xs mb-1"><span class="text-text">${m.title.split(' — ')[0]}</span><span class="text-text-dim">${prog}%</span></div>
+      <div class="w-full h-1.5 bg-surface rounded-full overflow-hidden"><div class="h-full progress-bar rounded-full transition-all" style="width:${prog}%"></div></div>
+    </div>`;
+  }).join('');
+}
+
+// ===================== MATERIALS =====================
+function renderMaterials() {
+  const grid = document.getElementById('materials-grid');
+  grid.innerHTML = materialsData.map(m => {
+    const prog = state.materialsProgress[m.id] || 0;
+    const catColor = m.category === 'farmako' || m.category === 'farmasi' ? 'text-cyan' : m.category === 'mikro' ? 'text-success' : m.category === 'biokimia' ? 'text-warning' : m.category === 'imuno' ? 'text-danger' : m.category === 'gizi' ? 'text-cyan' : 'text-warning';
+    const catBg = m.category === 'farmako' || m.category === 'farmasi' ? 'bg-cyan/20' : m.category === 'mikro' ? 'bg-success/20' : m.category === 'biokimia' ? 'bg-warning/20' : m.category === 'imuno' ? 'bg-danger/20' : m.category === 'gizi' ? 'bg-cyan/20' : 'bg-warning/20';
+    const catLabel = m.category === 'farmako' ? 'Farmakologi' : m.category === 'farmasi' ? 'Farmasi' : m.category === 'mikro' ? 'Mikrobiologi' : m.category === 'biokimia' ? 'Biokimia' : m.category === 'imuno' ? 'Imunologi' : m.category === 'gizi' ? 'Gizi' : 'Patologi';
+    return `<div class="glass rounded-xl p-5 relative overflow-hidden shimmer cursor-pointer group" onclick="navigate('material-detail', {materialId:'${m.id}'})">
+      <div class="flex items-center gap-2 mb-3">
+        <span class="px-2 py-0.5 rounded-full text-[11px] font-medium ${catBg} ${catColor}">${catLabel}</span>
+      </div>
+      <h3 class="text-text font-semibold mb-1 group-hover:text-cyan transition-colors">${m.title}</h3>
+      <p class="text-text-dim text-sm mb-4 line-clamp-2">${m.description}</p>
+      <div class="flex items-center justify-between">
+        <div class="flex-1 mr-3"><div class="w-full h-1.5 bg-surface rounded-full overflow-hidden"><div class="h-full progress-bar rounded-full transition-all" style="width:${prog}%"></div></div></div>
+        <span class="text-xs text-text-dim">${prog}%</span>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function renderMaterialDetail() {
+  const m = materialsData.find(x => x.id === state.selectedMaterialId);
+  if (!m) { navigate('materials'); return; }
+  const container = document.getElementById('material-content');
+  const catColor = m.category === 'farmako' || m.category === 'farmasi' ? 'text-cyan' : m.category === 'mikro' ? 'text-success' : m.category === 'biokimia' ? 'text-warning' : m.category === 'imuno' ? 'text-danger' : m.category === 'gizi' ? 'text-cyan' : 'text-warning';
+  const catBg = m.category === 'farmako' || m.category === 'farmasi' ? 'bg-cyan/20' : m.category === 'mikro' ? 'bg-success/20' : m.category === 'biokimia' ? 'bg-warning/20' : m.category === 'imuno' ? 'bg-danger/20' : m.category === 'gizi' ? 'bg-cyan/20' : 'bg-warning/20';
+  const catLabel = m.category === 'farmako' ? 'Farmakologi' : m.category === 'farmasi' ? 'Farmasi' : m.category === 'mikro' ? 'Mikrobiologi' : m.category === 'biokimia' ? 'Biokimia' : m.category === 'imuno' ? 'Imunologi' : m.category === 'gizi' ? 'Gizi' : 'Patologi';
+  container.innerHTML = `
+    <div class="glass rounded-xl p-6 md:p-8 mb-6">
+      <div class="flex items-center gap-2 mb-3">
+        <span class="px-2 py-0.5 rounded-full text-[11px] font-medium ${catBg} ${catColor}">${catLabel}</span>
+      </div>
+      <h1 class="font-display text-2xl md:text-3xl text-text mb-4">${m.title}</h1>
+      <div class="prose prose-invert max-w-none text-text-dim leading-relaxed">${m.content}</div>
+      <div class="mt-6 flex gap-3 flex-wrap">
+        <button onclick="markMaterialComplete('${m.id}')" class="btn-primary px-5 py-2 rounded-lg text-sm">Tandai Selesai</button>
+        <button onclick="navigate('quiz', {quizId:'${m.id}'})" class="px-5 py-2 rounded-lg border border-cyan/30 text-text hover:bg-cyan/10 transition-colors text-sm">Kerjakan Kuis</button>
+      </div>
+    </div>
+  `;
+  const note = state.notes[m.id] || '';
+  document.getElementById('note-textarea').value = note;
+}
+
+function markMaterialComplete(id) {
+  state.materialsProgress[id] = 100;
+  const m = materialsData.find(x => x.id === id);
+  addActivity('material', m.title.split(' — ')[0] + ' — Selesai');
+  saveState();
+  renderMaterialDetail();
+  renderDashboard();
+}
+
+function saveNote() {
+  const val = document.getElementById('note-textarea').value;
+  if (state.selectedMaterialId) {
+    state.notes[state.selectedMaterialId] = val;
+    saveState();
+    alert('Catatan disimpan!');
+  }
+}
+
+// ===================== QUIZ =====================
+let quizState = { questions: [], current: 0, correct: 0, answers: [], answered: [], quizId: null };
+
+function renderQuizList() {
+  const list = document.getElementById('quiz-list');
+  list.innerHTML = quizzesData.map(q => {
+    const score = state.quizScores[q.id];
+    const scoreText = score ? `<span class="text-success text-xs">${score.correct}/${score.total} benar</span>` : '<span class="text-text-dim text-xs">Belum dikerjakan</span>';
+    const catColor = q.category === 'farmako' || q.category === 'farmasi' ? 'text-cyan' : q.category === 'mikro' ? 'text-success' : q.category === 'biokimia' ? 'text-warning' : q.category === 'imuno' ? 'text-danger' : q.category === 'gizi' ? 'text-cyan' : 'text-warning';
+    const catBg = q.category === 'farmako' || q.category === 'farmasi' ? 'bg-cyan/20' : q.category === 'mikro' ? 'bg-success/20' : q.category === 'biokimia' ? 'bg-warning/20' : q.category === 'imuno' ? 'bg-danger/20' : q.category === 'gizi' ? 'bg-cyan/20' : 'bg-warning/20';
+    const catLabel = q.category === 'farmako' ? 'Farmakologi' : q.category === 'farmasi' ? 'Farmasi' : q.category === 'mikro' ? 'Mikrobiologi' : q.category === 'biokimia' ? 'Biokimia' : q.category === 'imuno' ? 'Imunologi' : q.category === 'gizi' ? 'Gizi' : 'Patologi';
+    return `<div class="glass rounded-xl p-5 cursor-pointer hover:border-cyan/50 transition-all" onclick="startQuiz('${q.id}')">
+      <div class="flex items-center justify-between mb-2">
+        <span class="px-2 py-0.5 rounded-full text-[11px] font-medium ${catBg} ${catColor}">${catLabel}</span>
+        ${scoreText}
+      </div>
+      <h3 class="text-text font-semibold mb-1">${q.title}</h3>
+      <p class="text-text-dim text-sm">${q.questions.length} soal pilihan ganda dengan penjelasan</p>
+    </div>`;
+  }).join('');
+}
+
+function startQuiz(id) {
+  const quiz = quizzesData.find(q => q.id === id);
+  if (!quiz) return;
+  quizState = { questions: quiz.questions, current: 0, correct: 0, answers: new Array(quiz.questions.length).fill(null), answered: new Array(quiz.questions.length).fill(false), quizId: id };
+  navigate('quiz-run');
+}
+
+function renderQuizRun() {
+  const q = quizState.questions[quizState.current];
+  const total = quizState.questions.length;
+  document.getElementById('quiz-current').textContent = quizState.current + 1;
+  document.getElementById('quiz-total').textContent = total;
+  document.getElementById('quiz-progress-bar').style.width = ((quizState.current / total) * 100) + '%';
+
+  const container = document.getElementById('quiz-question-container');
+  const explanationBox = document.getElementById('quiz-explanation');
+  const isAnswered = quizState.answered[quizState.current];
+  const selectedIdx = quizState.answers[quizState.current];
+
+  let optionsHtml = q.options.map((opt, i) => {
+    let btnClass = 'option-btn w-full text-left p-4 rounded-lg bg-surface/50 text-text text-sm flex items-center gap-3';
+    if (isAnswered) {
+      if (i === q.correct) btnClass += ' correct';
+      else if (i === selectedIdx) btnClass += ' wrong';
+      else btnClass += ' disabled';
+      btnClass += ' disabled';
+    }
+    return `<button onclick="answerQuiz(${i})" class="${btnClass}" data-idx="${i}">
+      <span class="w-7 h-7 rounded-full bg-cyan/20 text-cyan flex items-center justify-center text-xs font-semibold shrink-0">${String.fromCharCode(65+i)}</span>
+      <span>${opt}</span>
+    </button>`;
+  }).join('');
+
+  container.innerHTML = `
+    <div class="mb-6">
+      <h3 class="text-lg text-text font-medium leading-relaxed">${q.q}</h3>
+    </div>
+    <div class="space-y-3">${optionsHtml}</div>
+  `;
+
+  if (isAnswered) {
+    explanationBox.innerHTML = `<strong class="text-cyan">Penjelasan:</strong> ${q.explanation}`;
+    explanationBox.classList.remove('hidden');
+  } else {
+    explanationBox.classList.add('hidden');
+  }
+
+  updateQuizNavButtons();
+}
+
+function answerQuiz(idx) {
+  if (quizState.answered[quizState.current]) return;
+  const q = quizState.questions[quizState.current];
+  quizState.answers[quizState.current] = idx;
+  quizState.answered[quizState.current] = true;
+  if (idx === q.correct) quizState.correct++;
+  renderQuizRun();
+}
+
+function updateQuizNavButtons() {
+  const prevBtn = document.getElementById('quiz-prev-btn');
+  const nextBtn = document.getElementById('quiz-next-btn');
+  const finishBtn = document.getElementById('quiz-finish-btn');
+  prevBtn.disabled = quizState.current === 0;
+  prevBtn.classList.toggle('opacity-50', quizState.current === 0);
+  prevBtn.classList.toggle('cursor-not-allowed', quizState.current === 0);
+
+  const isLast = quizState.current === quizState.questions.length - 1;
+  const isAnswered = quizState.answered[quizState.current];
+
+  if (isLast) {
+    nextBtn.classList.add('hidden');
+    finishBtn.classList.remove('hidden');
+    finishBtn.disabled = !isAnswered;
+    finishBtn.classList.toggle('opacity-50', !isAnswered);
+    finishBtn.classList.toggle('cursor-not-allowed', !isAnswered);
+  } else {
+    nextBtn.classList.remove('hidden');
+    finishBtn.classList.add('hidden');
+    nextBtn.disabled = !isAnswered;
+    nextBtn.classList.toggle('opacity-50', !isAnswered);
+    nextBtn.classList.toggle('cursor-not-allowed', !isAnswered);
+  }
+}
+
+function prevQuizQuestion() {
+  if (quizState.current > 0) {
+    quizState.current--;
+    renderQuizRun();
+  }
+}
+
+function nextQuizQuestion() {
+  if (quizState.current < quizState.questions.length - 1 && quizState.answered[quizState.current]) {
+    quizState.current++;
+    renderQuizRun();
+  }
+}
+
+function finishQuizEarly() {
+  finishQuiz();
+}
+
+function finishQuiz() {
+  const total = quizState.questions.length;
+  const correct = quizState.correct;
+  state.quizScores[quizState.quizId] = { correct, total };
+  state.totalCorrect += correct;
+  const quiz = quizzesData.find(q => q.id === quizState.quizId);
+  addActivity('quiz', quiz.title + ' — ' + correct + '/' + total + ' benar');
+  saveState();
+  navigate('quiz-result');
+}
+
+function renderQuizResult() {
+  const total = quizState.questions.length;
+  const correct = quizState.correct;
+  document.getElementById('result-score').textContent = correct + '/' + total;
+  document.getElementById('result-percentage').textContent = Math.round((correct/total)*100) + '% benar';
+}
+
+function retryQuiz() {
+  startQuiz(quizState.quizId);
+}
+
+// ===================== EXAM =====================
+let examState = { questions: [], current: 0, correct: 0, answers: [], answered: [], examId: null, startTime: 0, timerInterval: null, timeLeft: 3600 };
+
+function renderExamList() {
+  const list = document.getElementById('exam-list');
+  list.innerHTML = examsData.map(e => {
+    const history = state.examHistory.filter(h => h.examId === e.id);
+    const last = history[0];
+    const scoreText = last ? `<span class="text-success text-xs">Terakhir: ${last.correct}/${last.total}</span>` : '<span class="text-text-dim text-xs">Belum dikerjakan</span>';
+    return `<div class="glass rounded-xl p-5 cursor-pointer hover:border-cyan/50 transition-all" onclick="startExam('${e.id}')">
+      <div class="flex items-center justify-between mb-2">
+        <span class="px-2 py-0.5 rounded-full text-[11px] font-medium bg-cyan/20 text-cyan">Ujian</span>
+        ${scoreText}
+      </div>
+      <h3 class="text-text font-semibold mb-1">${e.title}</h3>
+      <p class="text-text-dim text-sm">${e.description}</p>
+    </div>`;
+  }).join('');
+}
+
+function startExam(id) {
+  const exam = examsData.find(e => e.id === id);
+  if (!exam) return;
+  examState = { questions: exam.questions, current: 0, correct: 0, answers: new Array(exam.questions.length).fill(null), answered: new Array(exam.questions.length).fill(false), examId: id, startTime: Date.now(), timeLeft: 3600 };
+  navigate('exam-run');
+  startExamTimer();
+}
+
+function startExamTimer() {
+  if (examState.timerInterval) clearInterval(examState.timerInterval);
+  examState.timerInterval = setInterval(() => {
+    examState.timeLeft--;
+    const m = Math.floor(examState.timeLeft / 60);
+    const s = examState.timeLeft % 60;
+    const el = document.getElementById('exam-timer');
+    if (el) el.textContent = String(m).padStart(2,'0') + ':' + String(s).padStart(2,'0');
+    if (examState.timeLeft <= 0) { clearInterval(examState.timerInterval); finishExam(); }
+  }, 1000);
+}
+
+function renderExamRun() {
+  const q = examState.questions[examState.current];
+  const total = examState.questions.length;
+  document.getElementById('exam-current').textContent = examState.current + 1;
+  document.getElementById('exam-total').textContent = total;
+  document.getElementById('exam-progress-bar').style.width = ((examState.current / total) * 100) + '%';
+
+  const container = document.getElementById('exam-question-container');
+  const explanationBox = document.getElementById('exam-explanation');
+  const isAnswered = examState.answered[examState.current];
+
+  let optionsHtml = q.options.map((opt, i) => {
+    let btnClass = 'option-btn w-full text-left p-4 rounded-lg bg-surface/50 text-text text-sm flex items-center gap-3';
+    if (isAnswered) {
+      if (i === q.correct) btnClass += ' correct';
+      else if (i === examState.answers[examState.current]) btnClass += ' wrong';
+      else btnClass += ' disabled';
+      btnClass += ' disabled';
+    }
+    return `<button onclick="answerExam(${i})" class="${btnClass}" data-idx="${i}">
+      <span class="w-7 h-7 rounded-full bg-cyan/20 text-cyan flex items-center justify-center text-xs font-semibold shrink-0">${String.fromCharCode(65+i)}</span>
+      <span>${opt}</span>
+    </button>`;
+  }).join('');
+
+  container.innerHTML = `
+    <div class="mb-6">
+      <h3 class="text-lg text-text font-medium leading-relaxed">${q.q}</h3>
+    </div>
+    <div class="space-y-3">${optionsHtml}</div>
+  `;
+
+  if (isAnswered) {
+    explanationBox.innerHTML = `<strong class="text-cyan">Penjelasan:</strong> ${q.explanation}`;
+    explanationBox.classList.remove('hidden');
+  } else {
+    explanationBox.classList.add('hidden');
+  }
+
+  updateExamNavButtons();
+}
+
+function answerExam(idx) {
+  if (examState.answered[examState.current]) return;
+  const q = examState.questions[examState.current];
+  examState.answers[examState.current] = idx;
+  examState.answered[examState.current] = true;
+  if (idx === q.correct) examState.correct++;
+  renderExamRun();
+}
+
+function updateExamNavButtons() {
+  const prevBtn = document.getElementById('exam-prev-btn');
+  const nextBtn = document.getElementById('exam-next-btn');
+  const finishBtn = document.getElementById('exam-finish-btn');
+  prevBtn.disabled = examState.current === 0;
+  prevBtn.classList.toggle('opacity-50', examState.current === 0);
+  prevBtn.classList.toggle('cursor-not-allowed', examState.current === 0);
+
+  const isLast = examState.current === examState.questions.length - 1;
+  const isAnswered = examState.answered[examState.current];
+
+  if (isLast) {
+    nextBtn.classList.add('hidden');
+    finishBtn.classList.remove('hidden');
+    finishBtn.disabled = !isAnswered;
+    finishBtn.classList.toggle('opacity-50', !isAnswered);
+    finishBtn.classList.toggle('cursor-not-allowed', !isAnswered);
+  } else {
+    nextBtn.classList.remove('hidden');
+    finishBtn.classList.add('hidden');
+    nextBtn.disabled = !isAnswered;
+    nextBtn.classList.toggle('opacity-50', !isAnswered);
+    nextBtn.classList.toggle('cursor-not-allowed', !isAnswered);
+  }
+}
+
+function prevExamQuestion() {
+  if (examState.current > 0) {
+    examState.current--;
+    renderExamRun();
+  }
+}
+
+function nextExamQuestion() {
+  if (examState.current < examState.questions.length - 1 && examState.answered[examState.current]) {
+    examState.current++;
+    renderExamRun();
+  }
+}
+
+function finishExamEarly() {
+  finishExam();
+}
+
+function finishExam() {
+  if (examState.timerInterval) clearInterval(examState.timerInterval);
+  const total = examState.questions.length;
+  const correct = examState.correct;
+  const timeUsed = Math.floor((Date.now() - examState.startTime) / 60000);
+  state.examHistory.unshift({ examId: examState.examId, correct, total, time: timeUsed, date: new Date().toISOString() });
+  state.totalCorrect += correct;
+  addActivity('exam', 'Ujian — ' + correct + '/' + total + ' benar');
+  saveState();
+  navigate('exam-result');
+}
+
+function renderExamResult() {
+  const total = examState.questions.length;
+  const correct = examState.correct;
+  const timeUsed = Math.floor((Date.now() - examState.startTime) / 60000);
+  document.getElementById('exam-result-score').textContent = correct + '/' + total;
+  document.getElementById('exam-result-percentage').textContent = Math.round((correct/total)*100) + '% benar';
+  document.getElementById('exam-result-time').textContent = 'Waktu: ' + timeUsed + ' menit';
+}
+
+function retryExam() {
+  startExam(examState.examId);
+}
+
+// ===================== FLASHCARDS =====================
+function renderFlashcards(filter = 'all') {
+  const grid = document.getElementById('flashcards-grid');
+  const cards = filter === 'all' ? flashcardsData : flashcardsData.filter(f => f.category === filter);
+  grid.innerHTML = cards.map(f => {
+    const catLabel = f.category === 'farmako' ? 'Farmakologi' : f.category === 'farmasi' ? 'Farmasi' : f.category === 'mikro' ? 'Mikrobiologi' : f.category === 'biokimia' ? 'Biokimia' : f.category === 'imuno' ? 'Imunologi' : f.category === 'gizi' ? 'Gizi' : 'Patologi';
+    return `
+    <div class="flip-card h-48 cursor-pointer group" onclick="this.classList.toggle('flipped')">
+      <div class="flip-card-inner relative w-full h-full">
+        <div class="flip-card-front glass rounded-xl p-5 flex flex-col items-center justify-center text-center absolute inset-0">
+          <div class="text-xs text-cyan mb-2 uppercase tracking-wider">${catLabel}</div>
+          <p class="text-text font-medium text-sm">${f.front}</p>
+          <div class="mt-3 text-[10px] text-text-dim">Klik untuk membalik</div>
+        </div>
+        <div class="flip-card-back glass rounded-xl p-5 flex flex-col items-center justify-center text-center absolute inset-0 border-cyan/40">
+          <div class="text-xs text-success mb-2 uppercase tracking-wider">Jawaban</div>
+          <p class="text-text text-sm">${f.back}</p>
+        </div>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function filterFlashcards(cat) {
+  renderFlashcards(cat);
+  const labels = { all: 'semua', farmako: 'farmakologi', mikro: 'mikrobiologi', imuno: 'imunologi', biokimia: 'biokimia', gizi: 'gizi', patologi: 'patologi', farmasi: 'farmasi' };
+  document.querySelectorAll('#flashcard-filters button').forEach(b => {
+    const txt = b.textContent.trim().toLowerCase();
+    if (txt === labels[cat]) {
+      b.className = 'px-4 py-1.5 rounded-full text-sm border border-cyan/30 bg-cyan/20 text-text';
+    } else {
+      b.className = 'px-4 py-1.5 rounded-full text-sm border border-cyan/20 text-text-dim hover:bg-cyan/10 transition-colors';
+    }
+  });
+}
+
+// ===================== POMODORO =====================
+let pomodoroInterval = null;
+let pomodoroTime = 1500;
+let pomodoroRunning = false;
+
+function startPomodoro() {
+  navigate('dashboard');
+  setTimeout(() => {
+    const display = document.getElementById('pomodoro-display');
+    if (display) display.scrollIntoView({ behavior: 'smooth', block: 'center' });
+  }, 100);
+}
+
+function togglePomodoro() {
+  const btn = document.getElementById('pomodoro-btn');
+  if (pomodoroRunning) {
+    clearInterval(pomodoroInterval);
+    pomodoroRunning = false;
+    btn.textContent = 'Mulai';
+  } else {
+    pomodoroRunning = true;
+    btn.textContent = 'Jeda';
+    pomodoroInterval = setInterval(() => {
+      pomodoroTime--;
+      updatePomodoroDisplay();
+      if (pomodoroTime <= 0) {
+        clearInterval(pomodoroInterval);
+        pomodoroRunning = false;
+        btn.textContent = 'Mulai';
+        state.focusTime += 25;
+        addActivity('pomodoro', 'Pomodoro — 25 menit');
+        saveState();
+        alert('Sesi Pomodoro selesai!');
+        resetPomodoro();
+      }
+    }, 1000);
+  }
+}
+
+function resetPomodoro() {
+  clearInterval(pomodoroInterval);
+  pomodoroRunning = false;
+  pomodoroTime = 1500;
+  updatePomodoroDisplay();
+  const btn = document.getElementById('pomodoro-btn');
+  if (btn) btn.textContent = 'Mulai';
+}
+
+function updatePomodoroDisplay() {
+  const m = Math.floor(pomodoroTime / 60);
+  const s = pomodoroTime % 60;
+  const el = document.getElementById('pomodoro-display');
+  if (el) el.textContent = String(m).padStart(2,'0') + ':' + String(s).padStart(2,'0');
+}
+
+// ===================== SETTINGS & UTILS =====================
+function renderSettings() {
+  document.getElementById('settings-flashcount').textContent = flashcardsData.length;
+}
+
+function resetData() {
+  if (confirm('Yakin ingin menghapus semua data? Tindakan ini tidak bisa dibatalkan.')) {
+    localStorage.removeItem('medstudy-blok-v1');
+    state = getDefaultState();
+    saveState();
+    render();
+    alert('Data berhasil direset.');
+  }
+}
+
+function addActivity(type, description) {
+  const times = ['Baru saja', '1 menit lalu', '2 menit lalu', '5 menit lalu'];
+  const time = times[Math.floor(Math.random() * times.length)];
+  state.activities.unshift({ id: 'a' + Date.now(), type, description, time });
+  if (state.activities.length > 20) state.activities.pop();
+  saveState();
+}
+
+// ===================== INIT =====================
+document.addEventListener('DOMContentLoaded', () => {
+  render();
+});
+</script>
+</body>
+</html>
